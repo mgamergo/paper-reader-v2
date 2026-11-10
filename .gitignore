@@ -12,3 +12,7 @@ public/pdf.worker.min.mjs
 convex/_generated/
 next-env.d.ts
 *.tsbuildinfo
+artifacts/e2e-test-results/
+artifacts/e2e-focused-results/
+artifacts/e2e-origin-failure/
+artifacts/e2e-extended-results/
