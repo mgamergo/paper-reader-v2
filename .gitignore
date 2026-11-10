@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.convex/
+.data/
+test-results/
+playwright-report/
+*.log
+.DS_Store
