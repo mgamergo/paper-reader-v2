@@ -27,6 +27,7 @@ export const rerankSchema = z.object({
 });
 export const claimSchema = z.object({
   text: z.string().min(1).max(2500),
+  translation: z.string().max(4000).optional(),
   evidence: z
     .array(
       z.object({ chunkId: z.string(), quote: z.string().min(8).max(6000) }),
@@ -36,12 +37,14 @@ export const claimSchema = z.object({
 });
 export const draftSchema = z.object({
   sentences: z.array(claimSchema).max(12),
-  translation: z.string().max(12000),
+  translation: z.string().max(12000).default(""),
   terms: z
     .array(
       z.object({
         term: z.string().min(1).max(150),
-        definition: z.string().max(1000),
+        definition: z.string().min(1).max(1000),
+        translation: z.string().max(2000).optional(),
+        evidence: claimSchema.shape.evidence.optional(),
       }),
     )
     .max(12),

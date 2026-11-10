@@ -1,24 +1,26 @@
 {
   "runtime": "1.4.4",
-  "generatedAt": "2026-11-10T14:39:00.054Z",
-  "revision": "eaf34e6bb1d55c8965fdda108a1b0e3aff8556e7",
-  "workingTreeStatus": "M .env.example\n M .prettierrc.json\n M README.md\n M app/api/[...path]/route.ts\n M app/sign-in/[[...sign-in]]/page.tsx\n M convex.json\n M eslint.config.mjs\n M lib/server/api.ts\n M lib/server/network.ts\n M logbook.md\n M next.config.ts\n M postcss.config.mjs\n M proxy.ts\n?? artifacts/\n?? docs/rag-design.md\n?? docs/rag-evaluation.md\n?? docs/rag-integration.md\n?? docs/rag-verification.md\n?? lib/rag/\n?? lib/server/import-cache.ts\n?? lib/server/rag.ts\n?? playwright.config.ts\n?? scripts/cache-import-fixtures.ts\n?? scripts/eval-rag.ts\n?? scripts/fetch-eval-papers.ts\n?? tests/e2e/\n?? tests/fixtures/rag/\n?? tests/integration/rag-pipeline.test.ts\n?? tests/integration/rag-real-layout.test.ts\n?? tests/integration/rag-real-papers.test.ts\n?? tests/integration/retrieval-storage.test.ts\n?? tests/unit/import-cache.test.ts\n?? tests/unit/provider-config.test.ts\n?? tests/unit/rag-chunks.test.ts\n?? tests/unit/rag-evaluation.test.ts\n?? tests/unit/rag-fixtures.ts\n?? tests/unit/rag-provider.test.ts\n?? tests/unit/rag-ranking.test.ts\n?? tests/unit/rag-sentence-boundaries.test.ts",
+  "generatedAt": "2026-11-10T14:56:12.200Z",
+  "revision": "dee1be703abaa50e71685f6553ffc25f9482280a",
+  "workingTreeStatus": "M artifacts/rag-evaluation.json\n M components/learning-pane.tsx\n M docs/architecture.md\n M docs/rag-evaluation.md\n M docs/rag-integration.md\n M docs/ui-implementation.md\n M lib/domain.ts\n M lib/rag/contracts.ts\n M lib/rag/index.ts\n M lib/rag/mock.ts\n M lib/rag/provider.ts\n M logbook.md\n?? artifacts/acceptance-cleanup.json\n?? artifacts/acceptance-desktop-modal.png\n?? artifacts/acceptance-desktop.png\n?? artifacts/acceptance-mobile-chat.png\n?? artifacts/acceptance-mobile-modal.png\n?? artifacts/acceptance-mobile.png\n?? artifacts/acceptance-run-metadata.json\n?? artifacts/acceptance-tablet-chat.png\n?? artifacts/acceptance-tablet-modal.png\n?? artifacts/acceptance-tablet.png\n?? artifacts/e2e-assist-chat.json\n?? artifacts/e2e-assist-collection.json\n?? artifacts/e2e-assist-glossary.json\n?? artifacts/e2e-assist-mobile.json\n?? artifacts/e2e-assist-override.json\n?? artifacts/e2e-assist-refusal.json\n?? artifacts/e2e-assist-selection-drag.json\n?? artifacts/e2e-assist-selection.json\n?? artifacts/e2e-assist-simplify.json\n?? artifacts/e2e-assist-tablet.json\n?? artifacts/e2e-cleanup-4cbc1a59388a68dfc7fa25367ca1beafb1494349.json\n?? artifacts/e2e-cleanup-4cbc1a59388a68dfc7fa5fb2749b45521411505a.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60134e84a05087326ce930.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a606456954d8c3cfbd85397.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a6069642d3bdac4ecd47928.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a606ebbb89ea298c40de200.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a608bd3f173472b27c1f570.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60969a2cc941d42a13a38a.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60aac395f2b5692871bbde.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60b7eba0f52ebf684060b1.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60d124cbe01f724f48e6db.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60d37ecd0014573cb6e095.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60d4481463b5844cfd5a56.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60fa30e5fdbd215eb605c0.json\n?? artifacts/e2e-cleanup-6bf654160f377cf56a60fc89b1ec616c5a21914d.json\n?? artifacts/e2e-cleanup-af1f061db2b07af4675d9303a49b0928be8840f1.json\n?? artifacts/e2e-cleanup-af1f061db2b07af4675dd2606167edf4082c6265.json\n?? artifacts/e2e-focused-results.json\n?? artifacts/e2e-focused-results/\n?? artifacts/e2e-origin-failure/\n?? artifacts/e2e-pre-focus-results.json\n?? artifacts/e2e-results.json\n?? artifacts/e2e-test-results/\n?? artifacts/library-initial-desktop.png\n?? artifacts/reader-baseline-desktop.png\n?? artifacts/reader-baseline-mobile.png\n?? artifacts/reader-baseline-tablet.png\n?? artifacts/reader-baseline-text.txt\n?? artifacts/secret-scan.json\n?? artifacts/ui-smoke-text.txt\n?? docs/browser-acceptance.md\n?? lib/rag/text.ts\n?? playwright.config.ts\n?? tests/e2e/\n?? tests/integration/rag-bilingual-citations.test.ts",
   "fileHashes": {
-    "lib/domain.ts": "2dd34ecd711172e5b3fd7c79ae73a4fc8e6e865ea13619d91832039984507f42",
+    "lib/domain.ts": "e33ec8d7991f3b42a235cd1cc0a986d4519257882466bf828fc2049405057dc4",
     "lib/rag/chunks.ts": "a1d6f475d1423768be3f0fce719176de615237e3d1cadce17feb702a4fca8717",
     "lib/rag/citations.ts": "4eb2ced261d765754d88be248a0176f0fa12596f3173d846b44a5365a3d99f59",
-    "lib/rag/contracts.ts": "d13a67a3e1ee9c164ddf86c3a4edc494199373db1d085cb04f287de3892c5c78",
+    "lib/rag/contracts.ts": "f89939856ac4914bd0e324a9b7902710aa96286732858a4aac04920e74e02865",
     "lib/rag/evaluation.ts": "ceb029ee54a5c010901788ee726deb108ac98fec7e2e576399b6d4edc82b6951",
-    "lib/rag/index.ts": "99c26037f0fbc3bba72b585290609a3a1e5aef77110eb0873272df7a314e61a9",
-    "lib/rag/mock.ts": "ca8fea593a726ff2c0f34adc8341941706788c43a1fb2b93deb8eaeb148d0b64",
-    "lib/rag/provider.ts": "aa8898b8fe1da895fbc12881408366717c5acf5da021c9ea0c3f13af198ec619",
+    "lib/rag/index.ts": "3232807c6dfcca9fd1efb8f5447b44196030979413d8cab5d2fdb2b3575dc24c",
+    "lib/rag/mock.ts": "4d0c900a00062847a6400a4be53c598d0cdc783cdbeb122f92198d45ea9c48c2",
+    "lib/rag/provider.ts": "95fd61992ce4a3c51a91bee56594779c4351e07ad2e09288db244a36beec282e",
     "lib/rag/ranking.ts": "88228c0d53b6cefed904bf595241771210609a2e2dd52ac9aa3e642553dc73de",
+    "lib/rag/text.ts": "a7f2f51b58242012b8743a02e129209d0393cc3e1b7a0624f69d43214be75abc",
     "package.json": "3e6de827b488dc449e7f3b9301aa7c6c869c0c1e31d06f89a2832bd083143417",
     "scripts/eval-rag.ts": "2afe30b7448715cd2b7169ace95b4b118d94e3b618aa0e17bd9d03d39adcbc91",
     "scripts/fetch-eval-papers.ts": "4eee86df5b364051f517a131afe089c5456156e245c8aefe80d9e9b9cf57dacd",
     "tests/fixtures/rag/2101.00027v1.json": "bc5abc5d2d358edfc8636c89d8ca88a6db4d8bec67fb46b16df1a4f61c39a7ee",
     "tests/fixtures/rag/2402.00838v4.json": "fa9f584300c04744f4e344f50337e1eb5e54b881d321bc4ad00ff1a383e0f4b2",
     "tests/fixtures/rag/judgments.json": "60156afe2a279b44ec66f3fc0a1daab92b2493fb9c7b9c3067104ba183d685c5",
+    "tests/integration/rag-bilingual-citations.test.ts": "98bf944131646832ee6161109612aab02b957975e68fcc8f31532d65137df37b",
     "tests/integration/rag-pipeline.test.ts": "e7efb9cb5a70e7bb59304304b2ca504b70a58d42e9727ff0907c76ebe5b33089",
     "tests/integration/rag-real-layout.test.ts": "8060eff5886fbaa724ae1b05dfadc32b76132790d6ad3afe5b1e4ea89c167df0",
     "tests/integration/rag-real-papers.test.ts": "4084ba40a25ea3374dbbf6eaca8052d0056bf1ae7faca4f2d645f90032ac08ec",
@@ -1870,8 +1872,8 @@
           },
           "answerCorrect": false,
           "refused": false,
-          "faithfulClaims": 4,
-          "claims": 4,
+          "faithfulClaims": 2,
+          "claims": 2,
           "ranking": [
             {
               "id": "2402.00838v4:p4:g1:c0",
@@ -1901,117 +1903,7 @@
           ],
           "answer": [
             {
-              "text": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al.",
-              "citations": [
-                {
-                  "chunkId": "2402.00838v4:p4:g2:c0",
-                  "paperId": "2402.00838v4",
-                  "page": 4,
-                  "quote": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
-                  "rects": [
-                    {
-                      "x": 306.142,
-                      "y": 363.11189999999993,
-                      "width": 104.10815948400001,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 421.155,
-                      "y": 363.11189999999993,
-                      "width": 103.25288604400008,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 376.66089999999997,
-                      "width": 220.07538339600003,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 390.2109,
-                      "width": 40.93976930199999,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 347.638,
-                      "y": 392.3927,
-                      "width": 19.388220587999996,
-                      "height": 8.7273
-                    },
-                    {
-                      "x": 370.331,
-                      "y": 390.2109,
-                      "width": 154.07947385400004,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 403.75989999999996,
-                      "width": 220.08323794799992,
-                      "height": 10.9091
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "(2023); Ivison et al.",
-              "citations": [
-                {
-                  "chunkId": "2402.00838v4:p4:g2:c0",
-                  "paperId": "2402.00838v4",
-                  "page": 4,
-                  "quote": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
-                  "rects": [
-                    {
-                      "x": 306.142,
-                      "y": 363.11189999999993,
-                      "width": 104.10815948400001,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 421.155,
-                      "y": 363.11189999999993,
-                      "width": 103.25288604400008,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 376.66089999999997,
-                      "width": 220.07538339600003,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 390.2109,
-                      "width": 40.93976930199999,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 347.638,
-                      "y": 392.3927,
-                      "width": 19.388220587999996,
-                      "height": 8.7273
-                    },
-                    {
-                      "x": 370.331,
-                      "y": 390.2109,
-                      "width": 154.07947385400004,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 403.75989999999996,
-                      "width": 220.08323794799992,
-                      "height": 10.9091
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "(2023).",
+              "text": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
               "citations": [
                 {
                   "chunkId": "2402.00838v4:p4:g2:c0",
@@ -3635,8 +3527,8 @@
           },
           "answerCorrect": false,
           "refused": false,
-          "faithfulClaims": 3,
-          "claims": 3,
+          "faithfulClaims": 1,
+          "claims": 1,
           "ranking": [
             {
               "id": "2402.00838v4:p4:g1:c0",
@@ -3666,117 +3558,7 @@
           ],
           "answer": [
             {
-              "text": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al.",
-              "citations": [
-                {
-                  "chunkId": "2402.00838v4:p4:g2:c0",
-                  "paperId": "2402.00838v4",
-                  "page": 4,
-                  "quote": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
-                  "rects": [
-                    {
-                      "x": 306.142,
-                      "y": 363.11189999999993,
-                      "width": 104.10815948400001,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 421.155,
-                      "y": 363.11189999999993,
-                      "width": 103.25288604400008,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 376.66089999999997,
-                      "width": 220.07538339600003,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 390.2109,
-                      "width": 40.93976930199999,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 347.638,
-                      "y": 392.3927,
-                      "width": 19.388220587999996,
-                      "height": 8.7273
-                    },
-                    {
-                      "x": 370.331,
-                      "y": 390.2109,
-                      "width": 154.07947385400004,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 403.75989999999996,
-                      "width": 220.08323794799992,
-                      "height": 10.9091
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "(2023); Ivison et al.",
-              "citations": [
-                {
-                  "chunkId": "2402.00838v4:p4:g2:c0",
-                  "paperId": "2402.00838v4",
-                  "page": 4,
-                  "quote": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
-                  "rects": [
-                    {
-                      "x": 306.142,
-                      "y": 363.11189999999993,
-                      "width": 104.10815948400001,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 421.155,
-                      "y": 363.11189999999993,
-                      "width": 103.25288604400008,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 376.66089999999997,
-                      "width": 220.07538339600003,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 390.2109,
-                      "width": 40.93976930199999,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 347.638,
-                      "y": 392.3927,
-                      "width": 19.388220587999996,
-                      "height": 8.7273
-                    },
-                    {
-                      "x": 370.331,
-                      "y": 390.2109,
-                      "width": 154.07947385400004,
-                      "height": 10.9091
-                    },
-                    {
-                      "x": 306.142,
-                      "y": 403.75989999999996,
-                      "width": 220.08323794799992,
-                      "height": 10.9091
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "text": "(2023).",
+              "text": "Adaptation Evaluation We also evaluate OLMo after instruction fine-tuning and DPO training us- ing the T ÜLU evaluation suite proposed in Wang et al. (2023); Ivison et al. (2023).",
               "citations": [
                 {
                   "chunkId": "2402.00838v4:p4:g2:c0",

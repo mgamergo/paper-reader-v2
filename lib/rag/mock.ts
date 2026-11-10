@@ -1,22 +1,9 @@
 import type { RagProvider, DraftAnswer } from "./contracts";
 import { tokens } from "./ranking";
+import { splitSentences } from "./text";
 
 function sentences(text: string): string[] {
-  const period = "\uE000";
-  const normalized = text.replace(/\s+/g, " ");
-  const protectedText = normalized
-    .replace(/(?<=\d)\s*\.\s*(?=\d)/g, (part) => part.replaceAll(".", period))
-    .replace(/\b(?:et al|e\.g|i\.e|Fig|Eq|Dr|Prof|vs)\./gi, (part) =>
-      part.replaceAll(".", period),
-    )
-    .replace(/\b[A-Z]\.(?=\s+[A-Z][a-z])/g, (part) =>
-      part.replaceAll(".", period),
-    );
-  return [...protectedText.matchAll(/[^.!?]+(?:[.!?](?=\s|$)|$)/g)]
-    .map((match) =>
-      normalized.slice(match.index, match.index + match[0].length).trim(),
-    )
-    .filter((sentence) => sentence.length >= 20);
+  return splitSentences(text).filter((sentence) => sentence.length >= 20);
 }
 function lexicalTerms(text: string): string[] {
   return tokens(text)

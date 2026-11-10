@@ -212,23 +212,31 @@ export function LearningPane({
       void assist(action, query);
     },
   }));
-  async function saveTerm(
-    term: string,
-    definition: string,
-    translation: string,
-  ) {
+  async function saveTerm({
+    term,
+    definition,
+    translation,
+    source,
+    language: targetLanguage = answerLanguage,
+  }: Pick<GlossaryEntry, "term" | "definition" | "translation"> & {
+    source?: PassageCitation;
+    language?: string;
+  }) {
     setSaved("");
     try {
       const now = Date.now();
       await api.glossary({
         id: crypto.randomUUID(),
-        paperId: paper.id,
+        paperId: source?.paperId ?? paper.id,
         term,
         definition,
         translation,
-        language: answerLanguage,
+        language: targetLanguage,
         context:
-          lastRequest?.selection?.context ?? lastRequest?.query ?? paper.title,
+          source?.quote ??
+          lastRequest?.selection?.context ??
+          lastRequest?.query ??
+          paper.title,
         dueAt: now,
         interval: 0,
         repetitions: 0,
@@ -466,8 +474,14 @@ export function LearningPane({
                         `Define ${term} in the context of this paper.`,
                       )
                     }
-                    onSave={(term, definition) =>
-                      void saveTerm(term, definition, "")
+                    onSave={(term) =>
+                      void saveTerm({
+                        term: term.term,
+                        definition: term.definition,
+                        translation: term.translation ?? "",
+                        language: answer?.language ?? answerLanguage,
+                        source: term.citations?.[0],
+                      })
                     }
                   />
                 )}
@@ -539,8 +553,15 @@ export function LearningPane({
                         language="Translation"
                         onJump={onJump}
                         onDefine={(term) => void assist("define", term)}
-                        onSave={(term, definition) =>
-                          void saveTerm(term, definition, "")
+                        onSave={(term) =>
+                          void saveTerm({
+                            term: term.term,
+                            definition: term.definition,
+                            translation: term.translation ?? "",
+                            language:
+                              message.answer?.language ?? answerLanguage,
+                            source: term.citations?.[0],
+                          })
                         }
                       />
                     ) : (
@@ -703,11 +724,23 @@ function Answer({
   language: string;
   onJump: (citation: PassageCitation) => void;
   onDefine: (term: string) => void;
-  onSave: (term: string, definition: string) => void;
+  onSave: (term: RagAnswer["terms"][number]) => void;
 }) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const mock = /mock|offline|deterministic|synthetic/i.test(answer.provider);
+  const answerLanguage = answer.language ?? language;
+  const nativeSentences = answer.sentences.filter(
+    (sentence) => sentence.translation,
+  );
+  const nativeLang =
+    answerLanguage === "Hindi"
+      ? "hi"
+      : answerLanguage === "Telugu"
+        ? "te"
+        : answerLanguage === "Marathi"
+          ? "mr"
+          : undefined;
   function linkedTerms(text: string) {
     const terms = answer.terms
       .filter((t) => t.term.length > 0)
@@ -776,33 +809,41 @@ function Answer({
           </p>
         ))}
       </div>
-      <div className="bilingual-block translation">
-        <h3>
-          <Languages size={16} />
-          {language}
-        </h3>
-        {answer.translation ? (
-          <p
-            className="prose"
-            lang={
-              language === "Hindi"
-                ? "hi"
-                : language === "Telugu"
-                  ? "te"
-                  : language === "Marathi"
-                    ? "mr"
-                    : undefined
-            }
-          >
-            {answer.translation}
-          </p>
-        ) : (
-          <p className="muted">
-            A translation was not returned by this provider. No translated text
-            has been generated.
-          </p>
-        )}
-      </div>
+      {(answerLanguage.toLowerCase() !== "english" || answer.translation) && (
+        <div className="bilingual-block translation">
+          <h3>
+            <Languages size={16} />
+            {answerLanguage}
+          </h3>
+          {nativeSentences.length ? (
+            nativeSentences.map((sentence, index) => (
+              <p className="prose" key={index} lang={nativeLang}>
+                {linkedTerms(sentence.translation ?? "")}{" "}
+                {sentence.citations.map((citation, number) => (
+                  <button
+                    className="source-citation"
+                    key={`${citation.chunkId}-${number}`}
+                    aria-label={`Read source for ${answerLanguage} sentence on page ${citation.page}: ${citation.quote.slice(0, 90)}`}
+                    title={citation.quote}
+                    onClick={() => onJump(citation)}
+                  >
+                    p. {citation.page}
+                  </button>
+                ))}
+              </p>
+            ))
+          ) : answer.translation ? (
+            <p className="prose" lang={nativeLang}>
+              {answer.translation}
+            </p>
+          ) : (
+            <p className="muted">
+              A translation was not returned by this provider. No translated
+              text has been generated.
+            </p>
+          )}
+        </div>
+      )}
       {answer.terms.length > 0 && (
         <div className="answer-terms">
           <h4>Keep the vocabulary</h4>
@@ -815,11 +856,40 @@ function Answer({
                 >
                   {term.term}
                 </button>
-                <p>{term.definition}</p>
+                <p>
+                  {term.definition}{" "}
+                  {term.citations?.map((citation, index) => (
+                    <button
+                      className="source-citation"
+                      key={`${citation.chunkId}-${index}`}
+                      aria-label={`Read definition source for ${term.term} on page ${citation.page}`}
+                      title={citation.quote}
+                      onClick={() => onJump(citation)}
+                    >
+                      p. {citation.page}
+                    </button>
+                  ))}
+                </p>
+                {term.translation && (
+                  <p className="prose" lang={nativeLang}>
+                    {term.translation}{" "}
+                    {term.citations?.map((citation, index) => (
+                      <button
+                        className="source-citation"
+                        key={`${citation.chunkId}-${index}`}
+                        aria-label={`Read translated definition source for ${term.term} on page ${citation.page}`}
+                        title={citation.quote}
+                        onClick={() => onJump(citation)}
+                      >
+                        p. {citation.page}
+                      </button>
+                    ))}
+                  </p>
+                )}
               </div>
               <IconButton
                 label={`Save ${term.term} to glossary`}
-                onClick={() => onSave(term.term, term.definition)}
+                onClick={() => onSave(term)}
               >
                 <Plus size={16} />
               </IconButton>

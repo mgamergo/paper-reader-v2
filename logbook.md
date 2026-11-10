@@ -1,5 +1,9 @@
 # Logbook
 
+## 2026-11-10 • Paired native citations
+
+Paired translations and glossary definitions now carry passage links, preserve the answer's language, and reject uncited definitions or unmapped native text. Seven focused protocol regressions pass. English sentence splitting now happens before support verification and preserves spaced decimals. Production browser verification of these newest fields is pending the acceptance worker's handoff and a rebuild. All secret-history scanning completed with zero findings at dee1be7; repeat on the final commit.
+
 ## 2026-11-10 • Advanced RAG release gate
 
 - RAG worker delivered contextual indexing, layout-aware parent/child chunks, BM25/TF-IDF/dense/RRF stages, query expansion/HyDE, reranking, filters/graph expansion, exact source checks and real-paper evaluation. Index format3; offline embedding revision3, 256dimensions.

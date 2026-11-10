@@ -160,10 +160,22 @@ export const debugHitSchema = z.object({
 export type DebugHit = z.infer<typeof debugHitSchema>;
 export const answerSchema = z.object({
   sentences: z.array(
-    z.object({ text: z.string(), citations: z.array(passageCitationSchema) }),
+    z.object({
+      text: z.string(),
+      citations: z.array(passageCitationSchema),
+      translation: z.string().optional(),
+    }),
   ),
   translation: z.string(),
-  terms: z.array(z.object({ term: z.string(), definition: z.string() })),
+  terms: z.array(
+    z.object({
+      term: z.string(),
+      definition: z.string(),
+      translation: z.string().optional(),
+      citations: z.array(passageCitationSchema).optional(),
+    }),
+  ),
+  language: z.string().optional(),
   refused: z.boolean(),
   provider: z.string(),
   debug: z.object({

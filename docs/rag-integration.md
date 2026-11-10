@@ -50,7 +50,7 @@ Sentence citations contain page numbers and quotation-overlapping source-line re
 
 ## Schema limitations and remaining work
 
-The existing schema has one translation string and uncited glossary terms; it cannot attach sentence-specific anchors to translated sentences or individual definitions. Those fields are validated against cited English evidence but the UI cannot represent their own anchor mapping. A future domain extension could represent translated sentences with citation IDs and add explicit `limitations`, `finishReason`, and provenance/model-usage fields. No domain change is required to integrate this implementation now.
+Each English sentence can now carry its own paired translation and the same validated passage citations. Answers persist their requested language. Glossary definitions carry their own quote evidence, passage links, and optional supported definition translation. The aggregate translation string remains for copy/export and older saved clients. Unmapped or conflicting translations and uncited definitions are rejected. English-only mock answers do not invent native text. Explicit usage/cost metadata and a dedicated limitations field remain future extensions; provider limitations are currently in debug stages.
 
 A second model pass is not proof of entailment or prompt-injection immunity. No paid model or live compatible endpoint was exercised. Protocol tests validate payloads, output rejection, caching markers, custom-host configuration, timeouts, and bounded responses. Real-model multilingual quality, semantic retrieval quality, cost, and latency remain unmeasured. Parent owns authenticated Convex integration and browser verification; the implementation worker did not start application services or a browser.
 

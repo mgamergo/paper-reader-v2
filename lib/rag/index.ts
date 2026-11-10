@@ -1,3 +1,4 @@
+import { splitSentences } from "./text";
 import { z } from "zod";
 import {
   answerSchema,
@@ -514,21 +515,52 @@ export async function answerQuestion(input: AnswerInput): Promise<RagAnswer> {
   const provider = input.provider ?? new MockProvider();
   const request = assistRequestSchema.parse(input.request);
   const retrieved = await retrieve({ ...input, request, provider });
-  if (!retrieved.chunks.length)
-    return refuse(provider, retrieved.debug, "refusal:no-evidence");
+  const refusal = (reason: string): RagAnswer => ({
+    ...refuse(provider, retrieved.debug, reason),
+    language: request.language,
+  });
+  if (!retrieved.chunks.length) return refusal("refusal:no-evidence");
   const originalEvidence = evidence(retrieved.chunks);
-  const draft = draftSchema.parse(
+  let draft = draftSchema.parse(
     await provider.answer({ request, evidence: originalEvidence }),
   );
   if (draft.refused || !draft.sentences.length)
-    return refuse(provider, retrieved.debug, "refusal:provider");
-  const chunkMap = new Map(retrieved.chunks.map((c) => [c.id, c]));
-  for (const sentence of draft.sentences)
-    for (const citation of sentence.evidence) {
-      const chunk = chunkMap.get(citation.chunkId);
-      if (!chunk || !normalize(chunk.text).includes(normalize(citation.quote)))
-        return refuse(provider, retrieved.debug, "refusal:invalid-citation");
-    }
+    return refusal("refusal:provider");
+  const expanded = [];
+  for (const claim of draft.sentences) {
+    const parts = splitSentences(claim.text);
+    if (!parts.length || (parts.length > 1 && claim.translation))
+      return refusal("refusal:unsupported-claim");
+    for (const text of parts) expanded.push({ ...claim, text });
+  }
+  draft = draftSchema.parse({ ...draft, sentences: expanded });
+  const translated = draft.sentences.filter((sentence) =>
+    sentence.translation?.trim(),
+  );
+  const translation = translated
+    .map((sentence) => sentence.translation)
+    .join("\n");
+  if (request.language.toLowerCase() === "english" && translated.length)
+    return refusal("refusal:unsupported-claim");
+  if (
+    (translated.length > 0 && translated.length !== draft.sentences.length) ||
+    (draft.translation &&
+      normalize(draft.translation) !== normalize(translation))
+  )
+    return refusal("refusal:unsupported-claim");
+  draft = { ...draft, translation };
+  const chunkMap = new Map(retrieved.chunks.map((chunk) => [chunk.id, chunk]));
+  for (const term of draft.terms)
+    if (!term.evidence?.length) return refusal("refusal:uncited-term");
+  const references = [
+    ...draft.sentences.flatMap((sentence) => sentence.evidence),
+    ...draft.terms.flatMap((term) => term.evidence ?? []),
+  ];
+  for (const citation of references) {
+    const chunk = chunkMap.get(citation.chunkId);
+    if (!chunk || !normalize(chunk.text).includes(normalize(citation.quote)))
+      return refusal("refusal:invalid-citation");
+  }
   const verdict = supportSchema.parse(
     await provider.verify({
       request,
@@ -538,35 +570,42 @@ export async function answerQuestion(input: AnswerInput): Promise<RagAnswer> {
   );
   if (
     verdict.supported.length !== draft.sentences.length ||
-    verdict.supported.some((s) => !s) ||
+    verdict.supported.some((value) => !value) ||
     !verdict.translationSupported ||
     !verdict.termsSupported
   )
-    return refuse(provider, retrieved.debug, "refusal:unsupported-claim");
-  const segmenter = new Intl.Segmenter("en", { granularity: "sentence" });
-  const sentences = draft.sentences.flatMap((s) =>
-    [...segmenter.segment(s.text)].map((part) => ({
-      text: part.segment.trim(),
-      citations: s.evidence.flatMap((c) => {
-        const chunk = chunkMap.get(c.chunkId);
-        return chunk
-          ? [
-              {
-                chunkId: chunk.id,
-                paperId: chunk.paperId,
-                page: chunk.page,
-                quote: c.quote,
-                rects: citationRects(chunk, c.quote, input.papers),
-              },
-            ]
-          : [];
-      }),
-    })),
-  );
+    return refusal("refusal:unsupported-claim");
+  const citationsFor = (
+    references: (typeof draft)["sentences"][number]["evidence"],
+  ) =>
+    references.flatMap((reference) => {
+      const chunk = chunkMap.get(reference.chunkId);
+      return chunk
+        ? [
+            {
+              chunkId: chunk.id,
+              paperId: chunk.paperId,
+              page: chunk.page,
+              quote: reference.quote,
+              rects: citationRects(chunk, reference.quote, input.papers),
+            },
+          ]
+        : [];
+    });
   return answerSchema.parse({
-    sentences,
-    translation: draft.translation,
-    terms: draft.terms,
+    sentences: draft.sentences.map((sentence) => ({
+      text: sentence.text,
+      citations: citationsFor(sentence.evidence),
+      ...(sentence.translation ? { translation: sentence.translation } : {}),
+    })),
+    translation,
+    language: request.language,
+    terms: draft.terms.map((term) => ({
+      term: term.term,
+      definition: term.definition,
+      ...(term.translation ? { translation: term.translation } : {}),
+      citations: citationsFor(term.evidence ?? []),
+    })),
     refused: false,
     provider: provider.name,
     debug: {
@@ -576,6 +615,8 @@ export async function answerQuestion(input: AnswerInput): Promise<RagAnswer> {
         ...retrieved.debug.stages,
         "exact-quote-validation",
         "sentence-support-check",
+        ...(translated.length ? ["paired-translation-citations"] : []),
+        ...(draft.terms.length ? ["definition-passage-citations"] : []),
       ],
     },
   });
