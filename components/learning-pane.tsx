@@ -903,7 +903,8 @@ function Answer({
         <summary>
           Retrieval details{" "}
           <span>
-            {answer.debug.hits.length} passages · {answer.debug.elapsedMs} ms
+            {answer.debug.hits.length} passages ·{" "}
+            {Math.round(answer.debug.elapsedMs)} ms
           </span>
         </summary>
         <h4>Queries</h4>

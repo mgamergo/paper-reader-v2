@@ -46,6 +46,21 @@ test("arXiv UI import returns cached real bytes and deduplicates library state",
   const pdf = await request.get(`/api/papers/${paper.id}/pdf`);
   expect(pdf.ok()).toBe(true);
   expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+  for (const viewport of [
+    { name: "desktop", width: 1440, height: 900 },
+    { name: "mobile", width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect(page.locator(".textLayer span").first()).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `artifacts/acceptance-real-paper-${viewport.name}.png`,
+    });
+  }
 });
 
 test("split readers stay independent and collection chat persists scoped history", async ({

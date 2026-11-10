@@ -69,7 +69,7 @@ test("true empty library, fresh citation Add to library and readable source rest
     await page
       .getByRole("button", { name: "Preview reference [1]", exact: true })
       .first()
-      .focus();
+      .press("ArrowDown");
     await expect(
       card.getByRole("button", { name: "In your library", exact: true }),
     ).toBeDisabled();
