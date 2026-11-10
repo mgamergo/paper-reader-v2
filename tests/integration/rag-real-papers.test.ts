@@ -92,44 +92,46 @@ test("full contextual retrieval passes every unchanged real-paper answer and pas
   const judgments = z
     .array(judgmentSchema)
     .parse(await Bun.file("tests/fixtures/rag/judgments.json").json());
-  for (const judgment of judgments.filter((j) => j.split === "test")) {
-    const options = {
-      papers,
-      index,
-      request: assistRequestSchema.parse({ query: judgment.query }),
-      rewrite: false,
-      multiQuery: false,
-      hyde: false,
-      expandParents: false,
-      topK: 5,
-      candidateK: 24,
-      rerank: true,
-    };
-    const answer = await answerQuestion(options);
-    if (judgment.negative) {
-      expect(answer.refused, judgment.id).toBe(true);
-      continue;
-    }
-    const retrieval = await retrieve(options);
-    expect(
-      retrieval.chunks.some(
-        (chunk) =>
-          chunk.paperId === judgment.paperId &&
-          chunk.page === judgment.page &&
-          normalizePassage(chunk.text).includes(
-            normalizePassage(judgment.passage),
-          ),
-      ),
-      `${judgment.id} expected passage`,
-    ).toBe(true);
-    expect(answer.refused, `${judgment.id} answer available`).toBe(false);
-    const text = normalizePassage(
-      answer.sentences.map((sentence) => sentence.text).join(" "),
-    );
-    for (const pattern of judgment.answerPatterns)
+  for (const production of [false, true]) {
+    for (const judgment of judgments.filter((j) => j.split === "test")) {
+      const options = {
+        papers,
+        index,
+        request: assistRequestSchema.parse({ query: judgment.query }),
+        rewrite: production,
+        multiQuery: production,
+        hyde: production,
+        expandParents: production,
+        topK: 5,
+        candidateK: 24,
+        rerank: true,
+      };
+      const answer = await answerQuestion(options);
+      if (judgment.negative) {
+        expect(answer.refused, judgment.id).toBe(true);
+        continue;
+      }
+      const retrieval = await retrieve(options);
       expect(
-        new RegExp(pattern, "i").test(text),
-        `${judgment.id}: ${pattern}`,
+        retrieval.chunks.some(
+          (chunk) =>
+            chunk.paperId === judgment.paperId &&
+            chunk.page === judgment.page &&
+            normalizePassage(chunk.text).includes(
+              normalizePassage(judgment.passage),
+            ),
+        ),
+        `${judgment.id} expected passage`,
       ).toBe(true);
+      expect(answer.refused, `${judgment.id} answer available`).toBe(false);
+      const text = normalizePassage(
+        answer.sentences.map((sentence) => sentence.text).join(" "),
+      );
+      for (const pattern of judgment.answerPatterns)
+        expect(
+          new RegExp(pattern, "i").test(text),
+          `${judgment.id}: ${pattern}`,
+        ).toBe(true);
+    }
   }
 }, 60000);

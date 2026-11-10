@@ -123,6 +123,7 @@ const variants: {
   mode: RetrievalMode;
   contextual: boolean;
   rerank: boolean;
+  production?: boolean;
 }[] = [
   { name: "BM25-only", mode: "bm25", contextual: false, rerank: false },
   {
@@ -145,6 +146,13 @@ const variants: {
     rerank: true,
   },
 ];
+variants.push({
+  name: "Production stages (rewrite + multi-query + HyDE + parent expansion)",
+  mode: "hybrid",
+  contextual: true,
+  rerank: true,
+  production: true,
+});
 const rows = [];
 for (const variant of variants) {
   const index = variant.contextual ? contextual : plain;
@@ -157,6 +165,9 @@ for (const variant of variants) {
       request: assistRequestSchema.parse({ query: j.query }),
       ...fixed,
       ...variant,
+      ...(variant.production
+        ? { rewrite: true, multiQuery: true, hyde: true, expandParents: true }
+        : {}),
       k1: tuned.k1,
       b: tuned.b,
     };
@@ -293,15 +304,17 @@ const pct = (value: number | null) =>
 const table = [
   "| Ablation | Recall@5 | MRR@5 | nDCG@5 | Extractive faithfulness | Expected-answer match | Negative refusal |",
   "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
-  ...rows.map(
-    (r) =>
-      `| ${r.name} | ${pct(r.recallAt5)} | ${r.mrrAt5.toFixed(3)} | ${r.ndcgAt5.toFixed(3)} | ${pct(r.answerFaithfulness)} | ${pct(r.answerJudgmentAccuracy)} | ${pct(r.negativeRefusalRate)} |`,
-  ),
+  ...rows
+    .filter((row) => !row.name.startsWith("Production stages"))
+    .map(
+      (r) =>
+        `| ${r.name} | ${pct(r.recallAt5)} | ${r.mrrAt5.toFixed(3)} | ${r.ndcgAt5.toFixed(3)} | ${pct(r.answerFaithfulness)} | ${pct(r.answerJudgmentAccuracy)} | ${pct(r.negativeRefusalRate)} |`,
+    ),
 ].join("\n");
 await Bun.write(
   "docs/rag-evaluation.md",
   await format(
-    `# RAG evaluation\n\nGenerated ${report.generatedAt}. Base revision \`${revision}\`; working tree file SHA-256 hashes in \`artifacts/rag-evaluation.json\` identify the actual tested implementation. The revision and file hashes identify the tested implementation.\n\n${table}\n\n## Corpus and protocol\n\nTwo real arXiv papers, OLMo (2402.00838v4) and The Pile (2101.00027v1), first six PDF pages each; ${plain.chunks.length} chunks. Fixtures retain extracted text and approximate PDF glyph boxes, CC BY 4.0 attribution, original PDF SHA-256, source URL, download time, and page numbers. PDFs are not retained. Run \`bun scripts/fetch-eval-papers.ts\` to refresh from the pinned versions; failed downloads never become synthetic data. See fixture provenance for full author lists.\n\nEight development questions tune BM25 k1/b over a 3×3 grid. Twelve disjoint positive test questions and four negative questions are evaluated only after selecting k1=${tuned.k1}, b=${tuned.b}. All nine development grid configurations tied on this small set; the documented tie-break retained the defaults, not an evidence-backed tuning improvement. Development/test question text and passage judgments are fixed in \`tests/fixtures/rag/judgments.json\`. Ranking uses exact expected passage matches, not the answer model's relevance scores. Recall divides by all judged-relevant chunks, MRR@5 uses the first hit, nDCG@5 uses grade-3 passage judgments. No partial credit for merely finding the correct paper or page.\n\nAll five variants use identical original queries: rewrite, multi-query, HyDE, and parent expansion are disabled to isolate the listed changes. Those stages are tested separately through the public pipeline. Hybrid fuses BM25, independent TF-IDF cosine, and hash-dense ranks. Faithfulness checks each emitted English claim against its exact cited source quote; it excludes refusals. Expected-answer match additionally checks manually specified answer patterns. Negative queries require refusal, including a false optimizer premise. Per-question failures and outputs remain in the JSON artifact.\n\n## Limits\n\nThese are reproducibility checks, **not production model quality**. The offline provider uses hashed lexical tokens, template/excerpt context, lexical sentence reranking, and extractive English answers. It has no learned dense semantics, translation, or genuine simplification. Exact extraction naturally produces high faithfulness but can select irrelevant or incomplete sentences and fail false-premise questions. The test set is small and shares two source papers with development. BM25 parameters were selected using development questions only; generic heading-selection fixes came from a separate paper. The fixed test set was then inspected to repair sentence-boundary, naming-clause, and line-hyphenation failures; results were rerun without changing judgments. This is a development regression benchmark, not a pristine one-shot blind evaluation. No provider keys were used. Real-model multilingual quality, semantic entailment, retrieval latency/cost, and full-paper/image comprehension remain unmeasured.\n\nReproduce with \`bun run eval:rag\`. Full results, selected parameters, grid scores, failures, provider identity, and tested file hashes: \`artifacts/rag-evaluation.json\`.\n`,
+    `# RAG evaluation\n\nGenerated ${report.generatedAt}. Base revision \`${revision}\`; working tree file SHA-256 hashes in \`artifacts/rag-evaluation.json\` identify the actual tested implementation. The revision and file hashes identify the tested implementation.\n\n${table}\n\n## Corpus and protocol\n\nTwo real arXiv papers, OLMo (2402.00838v4) and The Pile (2101.00027v1), first six PDF pages each; ${plain.chunks.length} chunks. Fixtures retain extracted text and approximate PDF glyph boxes, CC BY 4.0 attribution, original PDF SHA-256, source URL, download time, and page numbers. PDFs are not retained. Run \`bun scripts/fetch-eval-papers.ts\` to refresh from the pinned versions; failed downloads never become synthetic data. See fixture provenance for full author lists.\n\nEight development questions tune BM25 k1/b over a 3×3 grid. Twelve disjoint positive test questions and four negative questions are evaluated only after selecting k1=${tuned.k1}, b=${tuned.b}. All nine development grid configurations tied on this small set; the documented tie-break retained the defaults, not an evidence-backed tuning improvement. Development/test question text and passage judgments are fixed in \`tests/fixtures/rag/judgments.json\`. Ranking uses exact expected passage matches, not the answer model's relevance scores. Recall divides by all judged-relevant chunks, MRR@5 uses the first hit, nDCG@5 uses grade-3 passage judgments. No partial credit for merely finding the correct paper or page.\n\nAll five variants use identical original queries: rewrite, multi-query, HyDE, and parent expansion are disabled to isolate the listed changes. The same unchanged judgments also gate a separate production-stage run with rewrite, multi-query, HyDE and parent expansion enabled; its metrics and all cases are retained as the sixth JSON row. Hybrid fuses BM25, independent TF-IDF cosine, and hash-dense ranks. Faithfulness checks each emitted English claim against its exact cited source quote; it excludes refusals. Expected-answer match additionally checks manually specified answer patterns. Negative queries require refusal, including a false optimizer premise. Per-question failures and outputs remain in the JSON artifact.\n\n## Limits\n\nThese are reproducibility checks, **not production model quality**. The offline provider uses hashed lexical tokens, template/excerpt context, lexical sentence reranking, and extractive English answers. It has no learned dense semantics, translation, or genuine simplification. Exact extraction naturally produces high faithfulness but can select irrelevant or incomplete sentences and fail false-premise questions. The test set is small and shares two source papers with development. BM25 parameters were selected using development questions only; generic heading-selection fixes came from a separate paper. The fixed test set was then inspected to repair sentence-boundary, naming-clause, and line-hyphenation failures; results were rerun without changing judgments. This is a development regression benchmark, not a pristine one-shot blind evaluation. No provider keys were used. Real-model multilingual quality, semantic entailment, retrieval latency/cost, and full-paper/image comprehension remain unmeasured.\n\nReproduce with \`bun run eval:rag\`. Full results, selected parameters, grid scores, failures, provider identity, and tested file hashes: \`artifacts/rag-evaluation.json\`.\n`,
     { parser: "markdown" },
   ),
 );
@@ -340,15 +353,20 @@ console.log(
   ),
 );
 
-const release = rows.find((row) => row.name === "Hybrid + contextual + rerank");
-if (!release)
-  throw new Error("The full retrieval configuration was not evaluated.");
-const releaseFailures = release.cases.filter(
-  (result) =>
-    !result.answerCorrect ||
-    (result.metrics !== undefined && result.metrics.recallAtK < 1),
-);
-if (releaseFailures.length || release.answerFaithfulness !== 1)
-  throw new Error(
-    `RAG release gate failed: ${releaseFailures.map((result) => result.id).join(", ") || "unfaithful answer"}. Reports were saved; repair the implementation without weakening judgments.`,
+for (const release of rows.filter(
+  (row) =>
+    row.name === "Hybrid + contextual + rerank" ||
+    row.name.startsWith("Production stages"),
+)) {
+  if (!release)
+    throw new Error("The full retrieval configuration was not evaluated.");
+  const releaseFailures = release.cases.filter(
+    (result) =>
+      !result.answerCorrect ||
+      (result.metrics !== undefined && result.metrics.recallAtK < 1),
   );
+  if (releaseFailures.length || release.answerFaithfulness !== 1)
+    throw new Error(
+      `RAG release gate failed: ${releaseFailures.map((result) => result.id).join(", ") || "unfaithful answer"}. Reports were saved; repair the implementation without weakening judgments.`,
+    );
+}

@@ -1,6 +1,6 @@
 # RAG evaluation
 
-Generated 2026-11-10T14:56:12.200Z. Base revision `dee1be703abaa50e71685f6553ffc25f9482280a`; working tree file SHA-256 hashes in `artifacts/rag-evaluation.json` identify the actual tested implementation. The revision and file hashes identify the tested implementation.
+Generated 2026-11-10T15:02:01.090Z. Base revision `950a5ca8d9662b54903d0ff3d06576895dcd3331`; working tree file SHA-256 hashes in `artifacts/rag-evaluation.json` identify the actual tested implementation. The revision and file hashes identify the tested implementation.
 
 | Ablation                     | Recall@5 | MRR@5 | nDCG@5 | Extractive faithfulness | Expected-answer match | Negative refusal |
 | ---------------------------- | -------: | ----: | -----: | ----------------------: | --------------------: | ---------------: |
@@ -16,7 +16,7 @@ Two real arXiv papers, OLMo (2402.00838v4) and The Pile (2101.00027v1), first si
 
 Eight development questions tune BM25 k1/b over a 3×3 grid. Twelve disjoint positive test questions and four negative questions are evaluated only after selecting k1=1.2, b=0.75. All nine development grid configurations tied on this small set; the documented tie-break retained the defaults, not an evidence-backed tuning improvement. Development/test question text and passage judgments are fixed in `tests/fixtures/rag/judgments.json`. Ranking uses exact expected passage matches, not the answer model's relevance scores. Recall divides by all judged-relevant chunks, MRR@5 uses the first hit, nDCG@5 uses grade-3 passage judgments. No partial credit for merely finding the correct paper or page.
 
-All five variants use identical original queries: rewrite, multi-query, HyDE, and parent expansion are disabled to isolate the listed changes. Those stages are tested separately through the public pipeline. Hybrid fuses BM25, independent TF-IDF cosine, and hash-dense ranks. Faithfulness checks each emitted English claim against its exact cited source quote; it excludes refusals. Expected-answer match additionally checks manually specified answer patterns. Negative queries require refusal, including a false optimizer premise. Per-question failures and outputs remain in the JSON artifact.
+All five variants use identical original queries: rewrite, multi-query, HyDE, and parent expansion are disabled to isolate the listed changes. The same unchanged judgments also gate a separate production-stage run with rewrite, multi-query, HyDE and parent expansion enabled; its metrics and all cases are retained as the sixth JSON row. Hybrid fuses BM25, independent TF-IDF cosine, and hash-dense ranks. Faithfulness checks each emitted English claim against its exact cited source quote; it excludes refusals. Expected-answer match additionally checks manually specified answer patterns. Negative queries require refusal, including a false optimizer premise. Per-question failures and outputs remain in the JSON artifact.
 
 ## Limits
 
