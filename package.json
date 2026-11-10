@@ -11,9 +11,13 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "bun test tests/unit tests/integration",
+    "test": "bun --env-file=.env.local test tests/unit tests/integration",
     "test:e2e": "playwright test",
-    "eval:rag": "bun scripts/eval-rag.ts"
+    "eval:rag": "bun scripts/eval-rag.ts",
+    "local": "bash scripts/dev-local.sh",
+    "postinstall": "bun scripts/prepare-assets.ts",
+    "test:unit": "bun test tests/unit",
+    "test:integration": "bun --env-file=.env.local test tests/integration"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.25",
@@ -24,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.49.0",
+    "ipaddr.js": "^2.5.0",
     "lucide-react": "^1.71.0",
     "next": "^16.4.6",
     "pdfjs-dist": "^6.5.438",
@@ -45,6 +50,6 @@
     "pdf-lib": "^1.17.1",
     "prettier": "^3.9.10",
     "tailwindcss": "^4.3.5",
-    "typescript": "^7.0.2"
+    "typescript": "6"
   }
 }

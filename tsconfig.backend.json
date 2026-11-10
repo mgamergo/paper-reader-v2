@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "lib/domain.ts",
+    "lib/server/**/*.ts",
+    "convex/**/*.ts",
+    "app/api/**/*.ts",
+    "proxy.ts"
+  ],
+  "exclude": ["node_modules"]
+}
