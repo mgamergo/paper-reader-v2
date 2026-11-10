@@ -11,17 +11,8 @@ import {
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
-export function Button({
-  className = "",
-  children,
-  ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button type="button" className={`button ${className}`} {...props}>
-      {children}
-    </button>
-  );
-}
+import { Button } from "@/components/ui/button";
+export { Button } from "@/components/ui/button";
 export function IconButton({
   label,
   children,

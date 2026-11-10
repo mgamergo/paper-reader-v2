@@ -25,3 +25,8 @@ postinstall. Keep its upstream license notices. Dependency licenses remain
 with their respective packages in node_modules and the committed lockfile
 identifies their versions. Review distribution obligations before publishing
 an application bundle or a public release.
+
+The Button and cn utilities adapt shadcn/ui's MIT-licensed owned-component
+pattern, customized to the reader's CSS tokens. Copyright (c) 2023 shadcn.
+Source: https://github.com/shadcn-ui/ui
+The upstream permission notice is retained in licenses/shadcn-ui.txt.
