@@ -11,7 +11,19 @@ export function citationRects(
     .find((p) => p.id === chunk.paperId)
     ?.pages.find((p) => p.number === chunk.page);
   if (!page) return chunk.rects;
-  const lines = pageLines(page);
+  const lines = pageLines(page).filter(
+    (line) =>
+      chunk.rects.length === 0 ||
+      line.rects.some((rect) =>
+        chunk.rects.some(
+          (anchor) =>
+            anchor.x === rect.x &&
+            anchor.y === rect.y &&
+            anchor.width === rect.width &&
+            anchor.height === rect.height,
+        ),
+      ),
+  );
   const source = lines.map((l) => normalize(l.text)).join(" ");
   const chunkStart = source.indexOf(normalize(chunk.text));
   const quoteStart = normalize(chunk.text).indexOf(normalize(quote));
