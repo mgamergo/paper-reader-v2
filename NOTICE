@@ -1,0 +1,27 @@
+paper-reader-v2 third-party material
+
+The MIT license applies to original project code and documentation. It does
+not replace licenses on third-party packages or research-paper content.
+
+The extracted research fixtures under tests/fixtures/rag retain their own
+Creative Commons Attribution 4.0 license, authorship, source URLs, original
+PDF hashes, extracted page numbers, and extraction dates in each JSON file's
+provenance field. The extraction changes layout into text spans and coordinates.
+
+- OLMo: Accelerating the Science of Language Models, Dirk Groeneveld and
+  coauthors, https://arxiv.org/abs/2402.00838v4
+- The Pile: An 800GB Dataset of Diverse Text for Language Modeling, Leo Gao and
+  coauthors, https://arxiv.org/abs/2101.00027v1
+
+CC BY 4.0 terms: https://creativecommons.org/licenses/by/4.0/
+
+The complete original paper PDFs are not included in those fixtures. Local
+import caches and user uploads remain outside Git and retain their original
+rights. The original reader verification PDF under tests/fixtures/reader is
+project-authored test material.
+
+The PDF.js worker is copied from the installed pdfjs-dist package during
+postinstall. Keep its upstream license notices. Dependency licenses remain
+with their respective packages in node_modules and the committed lockfile
+identifies their versions. Review distribution obligations before publishing
+an application bundle or a public release.

@@ -1,0 +1,72 @@
+name: Manual release verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: manual-reader-verification-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      APP_MODE: local
+      LLM_PROVIDER: mock
+      CONVEX_AGENT_MODE: anonymous
+      INSTABOX_HEADLESS: "1"
+      NEXT_TELEMETRY_DISABLED: "1"
+      IMPORT_FIXTURE_CACHE_DIR: ${{ github.workspace }}/.data/import-fixtures
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - name: Verify with local Convex and production Next
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .data/ci
+          reader_convex_pid=''
+          reader_next_pid=''
+          cleanup() {
+            for reader_pid in "$reader_next_pid" "$reader_convex_pid"; do
+              if [ -n "$reader_pid" ]; then
+                kill -TERM -- "-$reader_pid" 2>/dev/null || true
+              fi
+            done
+            sleep 2
+            for reader_pid in "$reader_next_pid" "$reader_convex_pid"; do
+              if [ -n "$reader_pid" ]; then
+                kill -KILL -- "-$reader_pid" 2>/dev/null || true
+                wait "$reader_pid" 2>/dev/null || true
+              fi
+            done
+          }
+          trap cleanup EXIT INT TERM
+          setsid bunx convex dev --typecheck disable --tail-logs disable > .data/ci/convex.log 2>&1 &
+          reader_convex_pid=$!
+          bun -e 'for(let i=0;i<120;i++){try{const r=await fetch("http://127.0.0.1:3210/version",{signal:AbortSignal.timeout(1000)});await r.body?.cancel();if(r.ok)process.exit(0)}catch{}await Bun.sleep(500)}process.exit(1)'
+          bunx convex env set CLERK_JWT_ISSUER_DOMAIN ''
+          bunx convex env set ALLOW_LOCAL_AUTH true
+          bun scripts/cache-import-fixtures.ts .data/import-fixtures 1706.03762
+          bun scripts/verify-release.ts --phase source
+          setsid bun run start > .data/ci/next.log 2>&1 &
+          reader_next_pid=$!
+          bun scripts/verify-release.ts --phase browser --base-url http://localhost:3000
+      - name: Retain verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-verification-${{ github.sha }}
+          path: |
+            .data/verification/
+            .data/verification-build.json
+            .data/ci/
+            artifacts/rag-evaluation.json
+            artifacts/e2e-results.json
+            artifacts/acceptance-*.png
+          if-no-files-found: warn
+          retention-days: 7
