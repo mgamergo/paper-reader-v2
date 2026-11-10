@@ -1,5 +1,7 @@
 # Browser acceptance reference
 
+Historical initial acceptance below intentionally records failures in the frozen pre-fix build. The parent fixed these bugs and added extended coverage. See `docs/release-verification.md` for the final rebuilt source/build identity, complete rerun, diagnostic exclusions, screenshots and review results. Do not cite the historical 15/19 as current release status.
+
 Final complete run: **19 tests, 15 passed, 4 failed, 0 skipped, 0 flaky**, 83.63 seconds, exit 1. Whole-project formatting, lint and type checking passed. No unexpected console, page, failed-request or HTTP diagnostics occurred in that final run. A three-case focused rerun also passed before the final full run. Application fixes remain with the parent.
 
 All code authoring and tests used the existing boxes.dev instance `0e09ad54-c2a4-4c19-8e9b-2d80fca789a4`, project `55820d6f-3b36-4755-a698-99a26f8ca460`, cwd `/home/boxes/repos/paper-reader-v2`, through workstation `/data/workspace/reader-v2-box`. No previous reader project, subagent, installation, Git mutation, application edit or server lifecycle change was used.
