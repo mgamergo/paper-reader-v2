@@ -106,3 +106,60 @@ test("high-zoom search and annotation/chat source jumps reveal the actual passag
     .click();
   await expectPassageInViewport(page.locator(".citation-flash").first());
 });
+
+test("mobile library navigation contains keyboard focus and restores its trigger", async ({
+  page,
+  owned,
+}) => {
+  for (const width of [768, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const trigger = page.getByRole("button", {
+      name: "Open library navigation",
+      exact: true,
+    });
+    await trigger.click();
+    const drawer = page.getByRole("dialog", {
+      name: "Library navigation",
+      exact: true,
+    });
+    await expect(drawer).toBeVisible();
+    await expect
+      .poll(() =>
+        drawer.evaluate((element) => element.contains(document.activeElement)),
+      )
+      .toBe(true);
+    for (let index = 0; index < 12; index++) {
+      await page.keyboard.press(index % 2 ? "Tab" : "Shift+Tab");
+      expect(
+        await drawer.evaluate((element) =>
+          element.contains(document.activeElement),
+        ),
+      ).toBe(true);
+    }
+    await page.keyboard.press("Escape");
+    await expect(drawer).toBeHidden();
+    await expect(trigger).toBeFocused();
+    await trigger.click();
+    await drawer
+      .getByRole("button", { name: "Add paper", exact: true })
+      .click();
+    const importer = page.getByRole("dialog", {
+      name: "Add a paper",
+      exact: true,
+    });
+    await expect(importer).toBeVisible();
+    await expect
+      .poll(() =>
+        importer.evaluate((element) =>
+          element.contains(document.activeElement),
+        ),
+      )
+      .toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(importer).toBeHidden();
+    await expect(trigger).toBeFocused();
+    await expect(
+      page.getByRole("heading", { name: owned.title, exact: true }),
+    ).toBeVisible();
+  }
+});

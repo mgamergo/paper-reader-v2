@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   useCallback,
   useEffect,
@@ -88,6 +89,16 @@ export default function Workspace({
   const [help, setHelp] = useState(false);
   const [focus, setFocus] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
+  const libraryTrigger = useRef<HTMLButtonElement>(null);
+  const importAfterLibraryClose = useRef(false);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1051px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setRailOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
   const [mobileMode, setMobileMode] = useState<"read" | "learn">("read");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -425,7 +436,7 @@ export default function Workspace({
         Skip to reading workspace
       </a>
       {library && !focus && (
-        <div className={`rail-container ${railOpen ? "rail-open" : ""}`}>
+        <div className="rail-container">
           <LibraryRail
             library={library}
             activeId={currentId ?? undefined}
@@ -437,25 +448,65 @@ export default function Workspace({
             }}
             onError={setError}
           />
-          <IconButton
-            label="Close library"
-            className="close-rail"
-            onClick={() => setRailOpen(false)}
-          >
-            <X size={18} />
-          </IconButton>
         </div>
+      )}
+      {library && (
+        <DialogPrimitive.Root open={railOpen} onOpenChange={setRailOpen}>
+          <DialogPrimitive.Portal>
+            <DialogPrimitive.Overlay className="library-drawer-overlay" />
+            <DialogPrimitive.Content
+              className="rail-container rail-open library-drawer"
+              aria-describedby={undefined}
+              id="library-navigation-drawer"
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                libraryTrigger.current?.focus();
+                if (importAfterLibraryClose.current) {
+                  importAfterLibraryClose.current = false;
+                  setImportOpen(true);
+                }
+              }}
+            >
+              <DialogPrimitive.Title className="sr-only">
+                Library navigation
+              </DialogPrimitive.Title>
+              <LibraryRail
+                library={library}
+                activeId={currentId ?? undefined}
+                onOpen={openPaper}
+                onImport={() => {
+                  importAfterLibraryClose.current = true;
+                  setRailOpen(false);
+                }}
+                onLibrary={() => {
+                  setCurrentId(null);
+                  setRailOpen(false);
+                }}
+                onError={setError}
+              />
+              <DialogPrimitive.Close asChild>
+                <Button aria-label="Close library" className="close-rail">
+                  <X size={18} />
+                </Button>
+              </DialogPrimitive.Close>
+            </DialogPrimitive.Content>
+          </DialogPrimitive.Portal>
+        </DialogPrimitive.Root>
       )}
       <div className="main-workspace" id="main-content">
         <header className="workspace-header">
           <div className="header-left">
-            <IconButton
-              label="Open library navigation"
-              className="mobile-menu"
-              onClick={() => setRailOpen((v) => !v)}
+            <Button
+              ref={libraryTrigger}
+              aria-label="Open library navigation"
+              aria-haspopup="dialog"
+              aria-expanded={railOpen}
+              aria-controls="library-navigation-drawer"
+              className="mobile-menu icon-button"
+              onClick={() => setRailOpen(true)}
             >
               <Menu size={20} />
-            </IconButton>
+            </Button>
             {paper ? (
               <>
                 <IconButton
