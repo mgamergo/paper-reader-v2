@@ -1,5 +1,9 @@
 # Logbook
 
+## 2026-11-10 • Acceptance fixes and production retrieval
+
+Fixed coordinate-aware repeated-word context, numbered-equation previews, exact-source glossary extraction, stale citation links and collection chat cleanup, and normalized local loopback origins. All 106 unit/integration tests passed with 488 assertions; strict types, lint and production build passed. Both isolated ablation and complete production-stage retrieval pass unchanged real-paper judgments. Fresh production browser run is active; no browser acceptance claim until it completes. Added arXiv DataCite DOI routing and bounded follow-up query context. Escape can be remapped while retaining physical Escape for accessible dismissal.
+
 ## 2026-11-10 • Paired native citations
 
 Paired translations and glossary definitions now carry passage links, preserve the answer's language, and reject uncited definitions or unmapped native text. Seven focused protocol regressions pass. English sentence splitting now happens before support verification and preserves spaced decimals. Production browser verification of these newest fields is pending the acceptance worker's handoff and a rebuild. All secret-history scanning completed with zero findings at dee1be7; repeat on the final commit.

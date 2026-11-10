@@ -143,9 +143,30 @@ test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, c
     expect(
       library.glossary.find((entry) => entry.id === word.id)?.repetitions,
     ).toBe(1);
+    const collectionMessage = {
+      ...message,
+      id: randomUUID(),
+      paperId: `collection:${collection.id}`,
+    };
+    await client.mutation(api.workspace.addMessages, {
+      json: JSON.stringify([collectionMessage]),
+    });
     await client.mutation(api.workspace.deleteCollection, {
       id: collection.id,
     });
+    // Reusing the same collection ID exposes any physically orphaned history.
+    await client.mutation(api.workspace.putCollection, {
+      json: JSON.stringify(collection),
+    });
+    expect(
+      await client.query(api.workspace.chat, {
+        paperId: `collection:${collection.id}`,
+      }),
+    ).toEqual([]);
+    await client.mutation(api.workspace.deleteCollection, {
+      id: collection.id,
+    });
+
     collectionId = undefined;
     expect(
       paperSchema.parse(await client.query(api.workspace.getPaper, { paperId }))

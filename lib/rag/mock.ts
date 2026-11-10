@@ -146,14 +146,30 @@ export class MockProvider implements RagProvider {
         request.action === "summarize" ? c.score >= 0.15 : c.eligible,
       )
       .slice(0, request.action === "summarize" ? 5 : 2);
-    // This mock quotes, never fabricates definitions, rewrites, or translations.
+    const definitions = selected.flatMap((candidate) => {
+      const term = candidate.text
+        .match(
+          /^([\p{L}][\p{L}\p{N} -]{0,80}?)\s+(?:is|are|refers to|means)\b/u,
+        )?.[1]
+        ?.trim();
+      return term && term.split(/\s+/).length <= 6
+        ? [
+            {
+              term,
+              definition: candidate.text,
+              evidence: [{ chunkId: candidate.chunkId, quote: candidate.text }],
+            },
+          ]
+        : [];
+    });
+    // Definitions remain verbatim source sentences; the mock cannot translate.
     return {
       sentences: selected.map((c) => ({
         text: c.text,
         evidence: [{ chunkId: c.chunkId, quote: c.text }],
       })),
       translation: "",
-      terms: [],
+      terms: definitions,
       refused: !selected.length,
     };
   }
@@ -170,7 +186,18 @@ export class MockProvider implements RagProvider {
         }),
       ),
       translationSupported: answer.translation === "",
-      termsSupported: answer.terms.length === 0,
+      termsSupported: answer.terms.every(
+        (term) =>
+          !term.translation &&
+          term.evidence?.some((c) => {
+            const chunk = evidence.find((e) => e.id === c.chunkId);
+            return (
+              !!chunk &&
+              normalize(chunk.text).includes(normalize(c.quote)) &&
+              normalize(c.quote) === normalize(term.definition)
+            );
+          }) === true,
+      ),
     };
   }
 }

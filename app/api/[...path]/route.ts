@@ -336,7 +336,9 @@ async function handle(request: Request, context: Context): Promise<Response> {
           /^(what about|and |how about|why |can you elaborate|explain more|it |this |that )/i.test(
             input.query,
           )
-            ? `${previous.join("\n")}\nFollow-up: ${input.query}`
+            ? `${previous.join("\n").slice(-Math.max(0, 3988 - input.query.length))}\nFollow-up: ${input.query}`.slice(
+                -4000,
+              )
             : input.query,
       };
       const answer = await askLibrary({

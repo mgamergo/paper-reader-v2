@@ -134,15 +134,14 @@ export function validateBinding(
     )
   )
     return "Use a key such as j, Shift+g, or Mod+k.";
-  if (commandId === "escape" && normalized !== "Escape")
-    return "Escape must remain available to dismiss overlays.";
+
   if (normalized === "Escape" && commandId !== "escape")
     return "Escape is reserved for closing overlays.";
   const command = commands.find((item) => item.id === commandId);
   if (
     command &&
     "global" in command &&
-    commandId !== "escape" &&
+    normalized !== "Escape" &&
     !/^(Mod|Alt)\+/.test(normalized)
   )
     return "Global commands need Mod or Alt so typing stays available.";
@@ -180,6 +179,8 @@ export function resolveCommand(
   overrides: Record<string, string>,
   context: { editing: boolean; search: boolean },
 ): Command | undefined {
+  if (binding === "Escape")
+    return commands.find((command) => command.id === "escape");
   return commands.find(
     (command) =>
       normalizeBinding(bindingFor(command, overrides)) === binding &&

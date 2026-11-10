@@ -56,6 +56,10 @@ import {
   HoverPopover,
 } from "./ui/primitives";
 import { indexTextLayer, normalizeSearch } from "./pdf-text";
+import {
+  paragraphContext,
+  internalReferenceTarget,
+} from "@/lib/reader-context";
 GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 export type ReadingSelection = {
   paperId: string;
@@ -120,34 +124,6 @@ function selectionRects(
         height: Math.abs((a[1] ?? 0) - (b[1] ?? 0)),
       };
     });
-}
-function paragraphContext(
-  paper: Pick<Paper, "pages">,
-  page: number,
-  text: string,
-  rects: Rect[],
-): string {
-  const data = paper.pages.find((p) => p.number === page);
-  if (!data) return text;
-  const position = data.text.indexOf(text);
-  if (position >= 0) {
-    const before = data.text.lastIndexOf("\n\n", position);
-    const after = data.text.indexOf("\n\n", position + text.length);
-    return data.text.slice(
-      Math.max(before + 2, position - 3000),
-      after < 0
-        ? Math.min(data.text.length, position + text.length + 3000)
-        : Math.min(after, position + text.length + 3000),
-    );
-  }
-  const first = rects[0];
-  const lines = first
-    ? data.spans
-        .filter((s) => Math.abs(s.rect.y - first.y) < 150)
-        .map((s) => s.text)
-        .join(" ")
-    : data.text;
-  return lines.slice(0, 16000);
 }
 export function PdfReader({
   paper,
@@ -765,14 +741,7 @@ function previewAnchors(
           : match[4].toLowerCase().startsWith("tab")
             ? "table"
             : "eq";
-        const candidate = paper.pages
-          .flatMap((p) => p.spans.map((s) => ({ page: p.number, span: s })))
-          .find((item) =>
-            new RegExp(
-              `^(?:${kind === "fig" ? "Fig(?:ure)?\\.?" : kind === "table" ? "Table" : "Eq(?:uation)?\\.?"})\\s*\\(?${match[5]}\\b`,
-              "i",
-            ).test(item.span.text),
-          );
+        const candidate = internalReferenceTarget(paper, kind, match[5] ?? "");
         if (candidate)
           result.push({
             kind: "internal",

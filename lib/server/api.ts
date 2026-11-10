@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { ImportError } from "./network";
 import { RagError } from "../rag";
+import { allowedWriteOrigin } from "./origin";
 export async function requestClient(
   request: Request,
 ): Promise<{ client: ConvexHttpClient; token: string | null }> {
@@ -16,12 +17,7 @@ export async function requestClient(
         403,
       );
   }
-  const origin = request.headers.get("origin");
-  if (
-    !["GET", "HEAD"].includes(request.method) &&
-    origin &&
-    origin !== new URL(request.url).origin
-  )
+  if (!allowedWriteOrigin(request, local))
     throw new ImportError("Cross-origin writes are not allowed.", 403);
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
   if (!url)

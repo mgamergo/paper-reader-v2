@@ -45,7 +45,7 @@ describe("keyboard contract", () => {
   test("remaps reject conflicts, invalid keys and stealing Escape", () => {
     expect(validateBinding("chat", "j", {})).toContain("Scroll down");
     expect(validateBinding("chat", "Escape", {})).toContain("reserved");
-    expect(validateBinding("escape", "Alt+q", {})).toContain("remain");
+    expect(validateBinding("escape", "Alt+q", {})).toBeNull();
     expect(validateBinding("chat", "", {})).not.toBeNull();
     expect(validateBinding("chat", "nonsense", {})).not.toBeNull();
     expect(validateBinding("chat", "Alt+q", {})).toBeNull();
@@ -112,4 +112,14 @@ test("modified plus keys remain reachable", () => {
     ),
   ).toBe("Mod++");
   expect(validateBinding("zoomIn", "Mod++", {})).toBeNull();
+});
+
+test("remapped dismissal retains physical Escape as an accessible fallback", async () => {
+  const { resolveCommand } = await import("../../lib/shortcuts");
+  for (const key of ["Escape", "Alt+q"])
+    expect(
+      resolveCommand(key, { escape: "Alt+q" }, { editing: true, search: false })
+        ?.id,
+    ).toBe("escape");
+  expect(validateBinding("escape", "q", {})).toContain("Global commands");
 });

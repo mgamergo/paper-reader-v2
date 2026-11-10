@@ -80,6 +80,14 @@ const crossrefSchema = z.object({
   }),
 });
 export async function resolveDoi(id: string): Promise<ResolvedSource> {
+  const arxiv = id.match(/^10\.48550\/arxiv\.(.+)$/i)?.[1];
+  if (arxiv) {
+    const source = parseImportSource(arxiv);
+    if (source.kind !== "arxiv") throw new ImportError("Invalid arXiv DOI.");
+    const resolved = await resolveArxiv(source.id);
+    return { ...resolved, metadata: { ...resolved.metadata, doi: id } };
+  }
+
   const resource = await fetchPublicResource(
     `https://api.crossref.org/works/${encodeURIComponent(id)}`,
     { maxBytes: 2 * 1024 * 1024, accept: "application/json" },

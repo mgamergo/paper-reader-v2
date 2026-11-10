@@ -292,6 +292,31 @@ export const deletePaper = mutation({
       .collect();
     for (const word of words)
       if (word.paperId === args.paperId) await ctx.db.delete(word._id);
+    const citingPapers = await ctx.db
+      .query("papers")
+      .withIndex("by_owner", (q) => q.eq("owner", owner))
+      .collect();
+    for (const citing of citingPapers) {
+      const metadata = metadataSchema.parse(JSON.parse(citing.json));
+      if (
+        metadata.references.some((ref) => ref.ingestedPaperId === args.paperId)
+      ) {
+        metadata.references = metadata.references.map((ref) => {
+          if (ref.ingestedPaperId !== args.paperId) return ref;
+          const { ingestedPaperId: removed, ...rest } = ref;
+          void removed;
+          return rest;
+        });
+        await ctx.db.patch(citing._id, { json: JSON.stringify(metadata) });
+      }
+    }
+    const manifests = await ctx.db
+      .query("indexes")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", args.paperId),
+      )
+      .collect();
+    for (const manifest of manifests) await ctx.db.delete(manifest._id);
     await ctx.storage.delete(record.storageId);
     await ctx.db.delete(record._id);
     return true;
@@ -418,6 +443,13 @@ export const deleteCollection = mutation({
         await ctx.db.patch(paper._id, { json: JSON.stringify(metadata) });
       }
     }
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", `collection:${args.id}`),
+      )
+      .collect();
+    for (const message of messages) await ctx.db.delete(message._id);
     await ctx.db.delete(row._id);
     return true;
   },
