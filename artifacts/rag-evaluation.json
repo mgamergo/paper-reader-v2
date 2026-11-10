@@ -1,8 +1,8 @@
 {
   "runtime": "1.4.4",
-  "generatedAt": "2026-11-10T16:54:13.096Z",
-  "revision": "6754de5719a7bc89a9ffd01814e74914acd56bba",
-  "workingTreeStatus": "M app/globals.css\n M artifacts/acceptance-desktop.png\n M artifacts/acceptance-mobile-modal.png\n M artifacts/acceptance-mobile.png\n M artifacts/acceptance-native-ui-protocol.png\n M artifacts/acceptance-real-paper-desktop.png\n M artifacts/acceptance-real-paper-mobile.png\n M artifacts/acceptance-tablet.png\n M artifacts/e2e-results.json\n M artifacts/rag-evaluation.json\n M components/learning-pane.tsx\n M components/pdf-reader.tsx\n M components/workspace.tsx\n M docs/operations.md\n M docs/rag-evaluation.md\n M docs/sol-loop.md\n M lib/rag/mock.ts\n M tests/e2e/acceptance.spec.ts\n M tests/unit/rag-source-definitions.test.ts\n?? tests/e2e/ui-review.spec.ts",
+  "generatedAt": "2026-11-10T17:05:40.523Z",
+  "revision": "f4a46c3f9a720a95231a0922e195e4cfb0b89479",
+  "workingTreeStatus": "",
   "fileHashes": {
     "lib/domain.ts": "bcac107b10d76257ef4b4339e556acd4bb8eb171b14dc733cf4bc21570b3a761",
     "lib/rag/chunks.ts": "333602667e6f434b7e2c8c793417b9331a229b0373fa962047e249a250be21c5",

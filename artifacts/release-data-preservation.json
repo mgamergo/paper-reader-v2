@@ -1,0 +1,27 @@
+{
+  "directory": ".data/backups/2026-11-10T17-11-32.382Z-64ba0290",
+  "createdAt": "2026-11-10T17:11:33.068Z",
+  "boxInstanceId": "0e09ad54-c2a4-4c19-8e9b-2d80fca789a4",
+  "localUrl": "http://127.0.0.1:3210",
+  "deploymentName": "anonymous-agent",
+  "includesFileStorage": true,
+  "archive": "snapshot.zip",
+  "bytes": 1316966,
+  "sha256": "cdbcb691287a9c7bd0102830e5dfbbb49517e68418765ab787e46827d69a2aed",
+  "zipIntegrity": "passed",
+  "restoreTested": false,
+  "tableCounts": {
+    "_tables": 10,
+    "annotations": 0,
+    "collections": 0,
+    "glossary": 0,
+    "messages": 0,
+    "uploads": 0,
+    "settings": 1,
+    "indexes": 1,
+    "papers": 1,
+    "pages": 15,
+    "chunks": 79,
+    "_storage": 1
+  }
+}

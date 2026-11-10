@@ -32,3 +32,4 @@ artifacts/*
 
 !artifacts/acceptance-library-*.png
 !artifacts/acceptance-delete-confirmation-desktop.png
+!artifacts/retrieval-comparison.html

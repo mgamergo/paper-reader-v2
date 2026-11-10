@@ -1,5 +1,11 @@
 # Logbook
 
+## 2026-11-10 • Final committed-SHA verification and preservation
+
+Clean starting SHAf4a46c3f9a720a95231a0922e195e4cfb0b89479; application fingerprinte05253e6084e7e64198890d6b0a74c0558f0d1ccbc3033b00e0f7c779b35adff; build1wkjn5MY4txgwCr9ubRbI; box0e09ad54-c2a4-4c19-8e9b-2d80fca789a4. Final format/lint/strict types,120tests/563assertions, unchanged RAG evaluations and production build pass. Matching final37browser cases pass with0failed/skipped/flaky; visual cancellation/drawer probe and4comparison viewports/themes pass with zero unexpected diagnostics. All12reader screenshots were captured, hashed and inspected; actual paper and authored/manual Hindi fixtures stay explicit. Both Sol passes approved(3functionality/2UIrounds). No application code changed after this tested SHA.
+
+Private export including PDF storage refreshed at.data/backups/2026-11-10T17-11-32.382Z-64ba0290, independently SHA/ZIP-verified inside box and on workstation. One paper/15pages/1PDF/1manifest/79chunks remain, no user-visible test residue. Final audit discovered134historical cache manifests from early runs; removed only those stale caches while retaining the current logical manifest unchanged and preserving pre-cleanup snapshot. This was cache maintenance, no code change. Full restore untested. Own Next/Convex/test browsers stopped and ports3000/3001/3210/3211 verified closed; box left running/intact. Final report/evidence-only commit follows; real-provider/Clerk quality and eight P2deferrals remain explicit.
+
 ## 2026-11-10 • Both independent reviews approved
 
 Functionality/RAG/security approved after3rounds; UI/UX approved after2rounds with allU1–U4 resolved and no new findings. Independent UI round2 passed global formatting/lint/types,2focused unit tests/8assertions and5focused browser cases, and confirmed unchanged source/build identity. Parent full gates are120tests/563assertions and37browser cases, unchanged RAG judgments/ablations and production build. Four UI feature commits were pushed and remote-equality checked individually: d464ae3,90fff05,c92ca83,d002d5d. All73P0+12P1 checklist rows now pass within explicit local/mock scope;8P2deferred. Final clean-SHA verification, fresh private backup and final report follow.

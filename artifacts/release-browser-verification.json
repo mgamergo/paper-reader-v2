@@ -1,12 +1,12 @@
 {
   "phase": "browser",
   "success": true,
-  "sha": "6754de5719a7bc89a9ffd01814e74914acd56bba",
+  "sha": "f4a46c3f9a720a95231a0922e195e4cfb0b89479",
   "sourceHash": "e05253e6084e7e64198890d6b0a74c0558f0d1ccbc3033b00e0f7c779b35adff",
-  "buildId": "23_LMZ8fP22y4dW-9a3Bp",
+  "buildId": "1wkjn5MY4txgwCr9ubRbI",
   "boxInstanceId": "0e09ad54-c2a4-4c19-8e9b-2d80fca789a4",
-  "startedAt": "2026-11-10T16:55:44.662Z",
-  "finishedAt": "2026-11-10T16:57:30.766Z",
+  "startedAt": "2026-11-10T17:06:26.411Z",
+  "finishedAt": "2026-11-10T17:08:06.598Z",
   "baseUrl": "http://127.0.0.1:3000",
   "convexUrl": "http://127.0.0.1:3210",
   "results": [
@@ -16,11 +16,11 @@
         "run",
         "test:e2e",
         "--workers=1",
-        "--output=.data/verification/2026-11-10T16-55-44.662Z-ad438f9f-browser/playwright"
+        "--output=.data/verification/2026-11-10T17-06-26.411Z-b34b880f-browser/playwright"
       ],
       "exitCode": 0,
-      "durationMs": 106037,
-      "log": ".data/verification/2026-11-10T16-55-44.662Z-ad438f9f-browser/1-test:e2e.log",
+      "durationMs": 100114,
+      "log": ".data/verification/2026-11-10T17-06-26.411Z-b34b880f-browser/1-test:e2e.log",
       "timedOut": false
     }
   ]

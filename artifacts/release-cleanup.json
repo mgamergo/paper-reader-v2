@@ -1,0 +1,12 @@
+{
+  "verifiedAt": "2026-11-10T17:15:11.744Z",
+  "ownedPortsClosed": [
+    3000,
+    3001,
+    3210,
+    3211
+  ],
+  "testBrowsersClosed": true,
+  "boxDisposition": "Running and intact; own application/test services stopped",
+  "boxInstanceId": "0e09ad54-c2a4-4c19-8e9b-2d80fca789a4"
+}

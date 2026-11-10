@@ -1,0 +1,13 @@
+{
+  "verifiedAt": "2026-11-10T17:08:10.158Z",
+  "success": true,
+  "sha256": "3cac54b6d6a675e1b368aa171d8442a983da4cc0d3521e19ef82c36534ee53d7",
+  "scenarios": 4,
+  "diagnostics": [],
+  "screenshots": [
+    "/tmp/paper-reader-v2-chart-desktop-light.png",
+    "/tmp/paper-reader-v2-chart-desktop-dark.png",
+    "/tmp/paper-reader-v2-chart-mobile-light.png",
+    "/tmp/paper-reader-v2-chart-mobile-dark.png"
+  ]
+}

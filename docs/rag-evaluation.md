@@ -1,6 +1,6 @@
 # RAG evaluation
 
-Generated 2026-11-10T16:54:13.096Z. Base revision `6754de5719a7bc89a9ffd01814e74914acd56bba`; working tree file SHA-256 hashes in `artifacts/rag-evaluation.json` identify the actual tested implementation. The revision and file hashes identify the tested implementation.
+Generated 2026-11-10T17:05:40.523Z. Base revision `f4a46c3f9a720a95231a0922e195e4cfb0b89479`; working tree file SHA-256 hashes in `artifacts/rag-evaluation.json` identify the actual tested implementation. The revision and file hashes identify the tested implementation.
 
 | Ablation                     | Recall@5 | MRR@5 | nDCG@5 | Extractive faithfulness | Expected-answer match | Negative refusal |
 | ---------------------------- | -------: | ----: | -----: | ----------------------: | --------------------: | ---------------: |

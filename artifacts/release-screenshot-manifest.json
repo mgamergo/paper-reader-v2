@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-11-10T17:13:42.155Z",
+  "inspectedSourceCommit": "f4a46c3f9a720a95231a0922e195e4cfb0b89479",
+  "verificationStartingCommit": "f4a46c3f9a720a95231a0922e195e4cfb0b89479",
+  "sourceHash": "e05253e6084e7e64198890d6b0a74c0558f0d1ccbc3033b00e0f7c779b35adff",
+  "buildId": "1wkjn5MY4txgwCr9ubRbI",
+  "boxInstanceId": "0e09ad54-c2a4-4c19-8e9b-2d80fca789a4",
+  "provider": "deterministic extractive/hash mock; manual Hindi fixture explicitly labeled",
+  "inspection": "Captured at the final verified build; parent screenshot inspection is recorded in docs/release-verification.md. Chromium viewport checks only.",
+  "images": [
+    {
+      "path": "artifacts/acceptance-desktop.png",
+      "subject": "reader verification fixture",
+      "viewport": "1440x900",
+      "bytes": 175924,
+      "sha256": "8cafe4d9b26e91a1c6cf913aab7411d7b0e44dd7a4c1378a7b8fd639b32603fc"
+    },
+    {
+      "path": "artifacts/acceptance-tablet.png",
+      "subject": "reader verification fixture",
+      "viewport": "768x1024",
+      "bytes": 100627,
+      "sha256": "94329626c4144c6612632a0f74955d1698312b639cf3cbe7f6c0d9af269b8871"
+    },
+    {
+      "path": "artifacts/acceptance-mobile.png",
+      "subject": "reader verification fixture",
+      "viewport": "390x844",
+      "bytes": 73977,
+      "sha256": "23218dd12cbf57eea937616cc9314945f98c951d10a608f2c04db2d04c4ac4a6"
+    },
+    {
+      "path": "artifacts/acceptance-mobile-modal.png",
+      "subject": "paper metadata dialog",
+      "viewport": "390x844",
+      "bytes": 58121,
+      "sha256": "acc26992d64735217e2a78c1852553d9eacf2f5c15f0a9a3b070ba68d4e1e414"
+    },
+    {
+      "path": "artifacts/acceptance-native-ui-protocol.png",
+      "subject": "manual Hindi protocol fixture; not generated language quality",
+      "viewport": "1440x900",
+      "bytes": 183505,
+      "sha256": "6378fd78717813218ab880083a3eaa468e16a6229b9b667ae6d649406d1e07b6"
+    },
+    {
+      "path": "artifacts/acceptance-real-paper-desktop.png",
+      "subject": "actual Attention Is All You Need PDF",
+      "viewport": "1440x900",
+      "bytes": 167416,
+      "sha256": "113da7928c6efb979f7e791741d8f25c43da0acc1898a1ed153a8adde61747df"
+    },
+    {
+      "path": "artifacts/acceptance-real-paper-mobile.png",
+      "subject": "actual Attention Is All You Need PDF",
+      "viewport": "390x844",
+      "bytes": 92236,
+      "sha256": "756c2d964e649190b0de783c74b7fa959bea6ca14c3c371207e9d4ee0eaf2bd1"
+    },
+    {
+      "path": "artifacts/acceptance-auth-unavailable-desktop.png",
+      "subject": "hosted missing-key fail-closed state",
+      "viewport": "1440x900",
+      "bytes": 21713,
+      "sha256": "6bd3937cb2f9b7edae56b7a6d746db5c2600c65ec38ddc0b754681b387ba4251"
+    },
+    {
+      "path": "artifacts/acceptance-auth-unavailable-mobile.png",
+      "subject": "hosted missing-key fail-closed state",
+      "viewport": "390x844",
+      "bytes": 16671,
+      "sha256": "89a385973edd64a99143385dc72fa38e6ad1ff793db4b951cd0e109a562ff175"
+    },
+    {
+      "path": "artifacts/acceptance-delete-confirmation-desktop.png",
+      "subject": "permanent deletion requires confirmation; cancel preserves data",
+      "viewport": "1440x900",
+      "bytes": 219432,
+      "sha256": "24f3cbf11f45c0d15eb417accb80aa305416f9055da124b846864625d9234a00"
+    },
+    {
+      "path": "artifacts/acceptance-library-tablet.png",
+      "subject": "modal library navigation and focus containment",
+      "viewport": "768x1024",
+      "bytes": 113183,
+      "sha256": "939757508d560032f2c473e98da38b8277cd466b0412197af59bfada6d604f14"
+    },
+    {
+      "path": "artifacts/acceptance-library-mobile.png",
+      "subject": "modal library navigation and focus containment",
+      "viewport": "390x844",
+      "bytes": 22208,
+      "sha256": "5181d453ce0babdaf273992e3fc50f43ea499c59c3d695aada04804cb8880029"
+    }
+  ]
+}
