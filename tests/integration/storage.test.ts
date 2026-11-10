@@ -10,6 +10,7 @@ import {
   paperSchema,
   type Annotation,
   type GlossaryEntry,
+  type ChatMessage,
 } from "../../lib/domain";
 test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, collections, history", async () => {
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -58,7 +59,7 @@ test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, c
       paperId,
       json: JSON.stringify({
         currentPage: 2,
-        progress: 50,
+        progress: 0.5,
         collectionIds: [collection.id],
         tags: ["verified"],
       }),
@@ -80,6 +81,19 @@ test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, c
       tags: ["term"],
       createdAt: Date.now(),
     };
+    await expect(
+      client.mutation(api.workspace.putAnnotation, {
+        json: JSON.stringify({ ...annotation, page: 999 }),
+      }),
+    ).rejects.toThrow("Annotation page does not exist");
+    await expect(
+      client.mutation(api.workspace.putAnnotation, {
+        json: JSON.stringify({
+          ...annotation,
+          rects: [{ x: -100, y: 0, width: 20, height: 10 }],
+        }),
+      }),
+    ).rejects.toThrow("outside the page");
     await client.mutation(api.workspace.putAnnotation, {
       json: JSON.stringify(annotation),
     });
@@ -110,7 +124,7 @@ test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, c
         dueAt: Date.now() + 86400000,
       }),
     });
-    const message = {
+    const message: ChatMessage = {
       id: randomUUID(),
       paperId,
       role: "user",

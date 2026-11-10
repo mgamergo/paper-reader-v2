@@ -1,6 +1,12 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 export default defineSchema({
+  indexes: defineTable({
+    owner: v.string(),
+    paperId: v.string(),
+    json: v.string(),
+    version: v.string(),
+  }).index("by_owner_paper", ["owner", "paperId"]),
   uploads: defineTable({
     owner: v.string(),
     storageId: v.id("_storage"),
@@ -66,11 +72,12 @@ export default defineSchema({
     embedding: v.array(v.float64()),
     version: v.string(),
     scope: v.string(),
+    chunkScope: v.optional(v.string()),
   })
     .index("by_owner_paper", ["owner", "paperId"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
-      dimensions: 384,
-      filterFields: ["owner", "paperId", "version", "scope"],
+      dimensions: 256,
+      filterFields: ["owner", "paperId", "version", "scope", "chunkScope"],
     }),
 });

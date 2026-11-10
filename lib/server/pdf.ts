@@ -167,7 +167,24 @@ export async function parsePdf(
       };
       await visit(rawOutline, 0);
     }
-    if (!outline.length)
+    for (const page of pages)
+      for (const line of page.text.split("\n")) {
+        const title = line.trim();
+        if (
+          /^(?:Abstract|References|Bibliography|Appendix(?:\s+[A-Z])?.*)$/i.test(
+            title,
+          ) &&
+          title.length < 100 &&
+          !outline.some(
+            (item) =>
+              item.page === page.number &&
+              item.title.toLowerCase() === title.toLowerCase(),
+          )
+        )
+          outline.push({ title, page: page.number, depth: 0 });
+      }
+    outline.sort((a, b) => a.page - b.page);
+    if (!rawOutline?.length)
       for (const page of pages) {
         for (const line of page.text.split("\n")) {
           const title = line.trim();

@@ -1,5 +1,16 @@
 # Logbook
 
+## 2026-11-10 • Ownership, vector scopes, and production reader integration
+
+- Backend feature 46b1e4e is pushed. RAG adapter now persists contextual index manifests and queries actual Convex vector search; contextual/BM25/TF-IDF/dense/RRF/rerank stages appear in API debug. Integration tests verify quote/page rectangles and unsupported refusal. Core RAG source/eval delegate is still finishing its owned paths.
+- Real arXiv import Attention Is All You Need succeeded: 15 pages, 42 parsed references, indexed ready. Root test paper ID a2fb805e-5f43-4cb9-a2b4-52f4cde03866.
+- Added real Convex tests with two local admin-impersonated identities. Fourteen assertions verify cross-user denial for paper/PDF/annotation/glossary/chat/chunk access and mutation. This proves function ownership rules, not external Clerk JWT/sign-in integration. Local admin credentials remain only in ignored Convex configuration and are never printed.
+- Vector filters now prefilter by owned composite chunk scopes for section/kind selection; regression asserts an explicit allowed chunk is the only dense hit. Index version changed to invalidate previous vector scopes.
+- Production build passed. Production Chromium library and selectable PDF text-layer smoke checks passed without console/page/network/HTTP errors. Desktop1440x900, tablet768x1024 and mobile390x844 root overflow checks passed.
+- Screenshot inspection found clipped import buttons, a too-narrow tablet paper pane, and a resize-related page indicator bug. Fixed button sizing, tablet Read/Learn breakpoint and retained IntersectionObserver entries. Production viewport regression now also asserts page1 remains page1 after resizing; passed.
+- Frontend shortcut/export tests: 11 passed, 77 assertions. Latest targeted UI/backend run: 16 passed, 131 assertions. Production broader flows, complete retrieval eval and both sol-loop passes remain pending.
+- Active parent-owned services: Convex started by /tmp/paper-reader-v2-convex.pid; production Next by /tmp/paper-reader-v2-next.pid, loopback3000. Logs under /tmp/paper-reader-v2-*. Final cleanup must stop these process trees only.
+
 ## 2026-11-10 • Persistence and ingestion
 
 - Convex local deployment is running. Convex 1.49 rejects deprecated --local; supported anonymous local mode used and documented. Explicit ALLOW_LOCAL_AUTH=true is local-only; Clerk production config fails closed.

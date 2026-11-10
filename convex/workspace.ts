@@ -240,7 +240,7 @@ export const patchPaper = mutation({
       ...JSON.parse(record.json),
       ...patch,
     });
-    metadata.progress = Math.max(0, Math.min(100, metadata.progress));
+    metadata.progress = Math.max(0, Math.min(1, metadata.progress));
     if (patch.currentPage !== undefined) {
       const pages = await ctx.db
         .query("pages")
@@ -318,6 +318,36 @@ export const putAnnotation = mutation({
     const owner = await requireOwner(ctx);
     const annotation = annotationSchema.parse(JSON.parse(args.json));
     await paperRecord(ctx, owner, annotation.paperId);
+    const pages = await ctx.db
+      .query("pages")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", annotation.paperId),
+      )
+      .collect();
+    const page = pages.find((page) => page.number === annotation.page);
+    if (!page) throw new ConvexError("Annotation page does not exist");
+    const dimensions = pageSchema.parse(JSON.parse(page.json));
+    if (
+      annotation.text.length > 20000 ||
+      annotation.comment.length > 20000 ||
+      annotation.tags.length > 30 ||
+      annotation.tags.some((tag) => tag.length > 80) ||
+      annotation.rects.length > 2000
+    )
+      throw new ConvexError("Annotation exceeds the supported size");
+    if (
+      annotation.rects.some(
+        (rect) =>
+          rect.x < -1 ||
+          rect.y < -1 ||
+          rect.width < 0 ||
+          rect.height < 0 ||
+          rect.x + rect.width > dimensions.width + 2 ||
+          rect.y + rect.height > dimensions.height + 2,
+      )
+    )
+      throw new ConvexError("Annotation coordinates are outside the page");
+
     const existing = await ctx.db
       .query("annotations")
       .withIndex("by_owner_id", (q) =>
@@ -548,7 +578,7 @@ export const replaceChunks = mutation({
     const chunks = z.array(chunkSchema).parse(JSON.parse(args.json));
     if (
       chunks.some(
-        (c) => c.paperId !== args.paperId || c.embedding.length !== 384,
+        (c) => c.paperId !== args.paperId || c.embedding.length !== 256,
       )
     )
       throw new ConvexError(
@@ -570,6 +600,12 @@ export const replaceChunks = mutation({
         embedding: chunk.embedding,
         version: args.version,
         scope: JSON.stringify([owner, args.paperId, args.version]),
+        chunkScope: JSON.stringify([
+          owner,
+          args.paperId,
+          args.version,
+          chunk.id,
+        ]),
       });
     return true;
   },
@@ -625,18 +661,11 @@ export const vectorHits = internalQuery({
   },
   handler: async (ctx, args) => {
     const docs = await Promise.all(args.ids.map((id) => ctx.db.get(id)));
-    return docs
-      .filter(
-        (doc) =>
-          doc &&
-          doc.owner === args.owner &&
-          args.paperIds.includes(doc.paperId),
-      )
-      .map((doc) => ({
-        id: doc!._id,
-        chunkId: doc!.chunkId,
-        version: doc!.version,
-      }));
+    return docs.flatMap((doc) =>
+      doc && doc.owner === args.owner && args.paperIds.includes(doc.paperId)
+        ? [{ id: doc._id, chunkId: doc.chunkId, version: doc.version }]
+        : [],
+    );
   },
 });
 
@@ -654,5 +683,84 @@ export const updateReference = mutation({
     );
     await ctx.db.patch(record._id, { json: JSON.stringify(metadata) });
     return reference;
+  },
+});
+
+export const indexManifest = query({
+  args: { paperId: v.string() },
+  handler: async (ctx, args) => {
+    const owner = await requireOwner(ctx);
+    await paperRecord(ctx, owner, args.paperId);
+    const record = await ctx.db
+      .query("indexes")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", args.paperId),
+      )
+      .unique();
+    return record ? { json: record.json, version: record.version } : null;
+  },
+});
+export const saveManifest = mutation({
+  args: { paperId: v.string(), json: v.string(), version: v.string() },
+  handler: async (ctx, args) => {
+    const owner = await requireOwner(ctx);
+    await paperRecord(ctx, owner, args.paperId);
+    if (args.json.length > 100000)
+      throw new ConvexError("Index manifest exceeds limit");
+    JSON.parse(args.json);
+    const row = await ctx.db
+      .query("indexes")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", args.paperId),
+      )
+      .unique();
+    if (row)
+      await ctx.db.patch(row._id, { json: args.json, version: args.version });
+    else await ctx.db.insert("indexes", { owner, ...args });
+    return true;
+  },
+});
+
+export const clearIndex = mutation({
+  args: { paperId: v.string() },
+  handler: async (ctx, args) => {
+    const owner = await requireOwner(ctx);
+    await paperRecord(ctx, owner, args.paperId);
+    const rows = await ctx.db
+      .query("indexes")
+      .withIndex("by_owner_paper", (q) =>
+        q.eq("owner", owner).eq("paperId", args.paperId),
+      )
+      .collect();
+    for (const row of rows) await ctx.db.delete(row._id);
+    return true;
+  },
+});
+
+export const filteredVectorScopes = internalQuery({
+  args: {
+    owner: v.string(),
+    paperIds: v.array(v.string()),
+    version: v.string(),
+    chunkIds: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const allowed = new Set(args.chunkIds);
+    const result: string[] = [];
+    for (const paperId of args.paperIds) {
+      const rows = await ctx.db
+        .query("chunks")
+        .withIndex("by_owner_paper", (q) =>
+          q.eq("owner", args.owner).eq("paperId", paperId),
+        )
+        .collect();
+      for (const row of rows)
+        if (row.version === args.version && allowed.has(row.chunkId))
+          result.push(
+            row.chunkScope ??
+              JSON.stringify([args.owner, paperId, args.version, row.chunkId]),
+          );
+    }
+    return result;
   },
 });

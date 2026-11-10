@@ -5,3 +5,7 @@ bun.lock
 artifacts
 test-results
 playwright-report
+.convex
+.data
+*.tsbuildinfo
+.env*
