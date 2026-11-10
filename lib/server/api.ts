@@ -4,19 +4,16 @@ import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { ImportError } from "./network";
 import { RagError } from "../rag";
-import { allowedWriteOrigin } from "./origin";
+import { allowedWriteOrigin, localRequestAllowed } from "./origin";
 export async function requestClient(
   request: Request,
 ): Promise<{ client: ConvexHttpClient; token: string | null }> {
   const local = process.env.APP_MODE === "local";
-  if (local) {
-    const hostname = new URL(request.url).hostname;
-    if (!["localhost", "127.0.0.1", "[::1]"].includes(hostname))
-      throw new ImportError(
-        "Local workspace mode is restricted to loopback. Configure Clerk for hosted access.",
-        403,
-      );
-  }
+  if (local && !localRequestAllowed(request))
+    throw new ImportError(
+      "Local workspace mode is restricted to loopback. Configure Clerk for hosted access.",
+      403,
+    );
   if (!allowedWriteOrigin(request, local))
     throw new ImportError("Cross-origin writes are not allowed.", 403);
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
