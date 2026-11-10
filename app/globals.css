@@ -2466,3 +2466,26 @@ kbd {
   width: 100%;
   font-size: 11px;
 }
+
+.auth-screen {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.auth-panel {
+  width: min(100%, 480px);
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.auth-panel h1 {
+  margin: 0 0 16px;
+}
+.auth-panel p {
+  margin: 0 0 24px;
+  line-height: 1.6;
+}

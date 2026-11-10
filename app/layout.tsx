@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
+import { configuredWorkspaceAuth } from "@/lib/server/auth-mode";
 export const metadata: Metadata = {
   title: "Paper reader · Your research desk",
   description:
@@ -14,8 +15,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
-          <ClerkProvider>{children}</ClerkProvider>
+        {configuredWorkspaceAuth() === "clerk" ? (
+          <ClerkProvider
+            signInUrl="/sign-in"
+            signUpUrl="/sign-up"
+            signInFallbackRedirectUrl="/"
+            signUpFallbackRedirectUrl="/"
+            afterSignOutUrl="/sign-in"
+          >
+            {children}
+          </ClerkProvider>
         ) : (
           children
         )}

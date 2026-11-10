@@ -1,6 +1,12 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -56,7 +62,11 @@ const References = dynamic(
   () => import("./pdf-reader").then((module) => module.ReferencesPanel),
   { ssr: false },
 );
-export default function Workspace() {
+export default function Workspace({
+  accountMenu,
+}: {
+  accountMenu?: ReactNode;
+}) {
   const [library, setLibrary] = useState<Library | null>(null);
   const [loadError, setLoadError] = useState("");
   const [retry, setRetry] = useState(0);
@@ -469,6 +479,7 @@ export default function Workspace() {
             )}
           </div>
           <div className="header-actions">
+            {accountMenu}
             <IconButton
               label="Command palette"
               onClick={() => setPalette(true)}
