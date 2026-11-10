@@ -1,9 +1,6 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-const isPublic = createRouteMatcher(["/sign-in(.*)"]);
-const clerk = clerkMiddleware(async (auth, request) => {
-  if (!isPublic(request)) await auth.protect();
-});
+const clerk = clerkMiddleware();
 export default process.env.APP_MODE === "local"
   ? () => NextResponse.next()
   : clerk;

@@ -7,6 +7,9 @@ export default defineConfig([
   { rules: { "@typescript-eslint/no-explicit-any": "error" } },
   globalIgnores([
     ".next/**",
+    ".convex/**",
+    ".data/**",
+    "public/pdf.worker.min.mjs",
     "convex/_generated/**",
     "artifacts/**",
     "test-results/**",

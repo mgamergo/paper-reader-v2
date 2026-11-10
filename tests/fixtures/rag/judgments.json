@@ -1,0 +1,246 @@
+[
+  {
+    "id": "dev-olmo-bias",
+    "split": "dev",
+    "paperId": "2402.00838v4",
+    "page": 2,
+    "query": "Why does OLMo exclude bias terms?",
+    "passage": "we exclude all bias terms",
+    "expectedAnswer": "Bias terms are excluded to improve training stability.",
+    "answerPatterns": ["stability"]
+  },
+  {
+    "id": "dev-olmo-layernorm",
+    "split": "dev",
+    "paperId": "2402.00838v4",
+    "page": 2,
+    "query": "What is non-parametric layer norm in OLMo?",
+    "passage": "no affine transformation",
+    "expectedAnswer": "The norm has no affine transformation or adaptive gain or bias.",
+    "answerPatterns": ["affine", "no"]
+  },
+  {
+    "id": "dev-olmo-rope",
+    "split": "dev",
+    "paperId": "2402.00838v4",
+    "page": 3,
+    "query": "Which positional embeddings replace absolute embeddings in OLMo?",
+    "passage": "replace absolute positional embeddings",
+    "expectedAnswer": "Rotary positional embeddings (RoPE) replace absolute positional embeddings.",
+    "answerPatterns": ["rotary"]
+  },
+  {
+    "id": "dev-olmo-vocab",
+    "split": "dev",
+    "paperId": "2402.00838v4",
+    "page": 3,
+    "query": "What is the final vocabulary size of the OLMo tokenizer?",
+    "passage": "final vocabulary size is 50,280",
+    "expectedAnswer": "The vocabulary has 50,280 tokens; the embedding matrix is padded to 50,304.",
+    "answerPatterns": ["50,280"]
+  },
+  {
+    "id": "dev-pile-crawl",
+    "split": "dev",
+    "paperId": "2101.00027v1",
+    "page": 3,
+    "query": "How does Pile-CC extract text from Common Crawl?",
+    "passage": "uses jus- Text",
+    "expectedAnswer": "Pile-CC uses jusText on Web Archive files instead of directly using WET files.",
+    "answerPatterns": ["jus", "web archive"]
+  },
+  {
+    "id": "dev-pile-owt",
+    "split": "dev",
+    "paperId": "2101.00027v1",
+    "page": 4,
+    "query": "What proxy for outgoing link quality does OpenWebText2 use?",
+    "passage": "net upvotes on Reddit",
+    "expectedAnswer": "It uses net upvotes on Reddit submissions as a proxy for link quality.",
+    "answerPatterns": ["upvotes", "reddit"]
+  },
+  {
+    "id": "dev-pile-github",
+    "split": "dev",
+    "paperId": "2101.00027v1",
+    "page": 4,
+    "query": "Why was GitHub included in the Pile?",
+    "passage": "better downstream performance on code-related tasks",
+    "expectedAnswer": "The authors hope GitHub will improve performance on code-related tasks.",
+    "answerPatterns": ["code-related"]
+  },
+  {
+    "id": "dev-pile-patent",
+    "split": "dev",
+    "paperId": "2101.00027v1",
+    "page": 4,
+    "query": "Why does the Pile include USPTO Backgrounds?",
+    "passage": "technical writing on applied subjects",
+    "expectedAnswer": "It provides technical writing on applied subjects aimed at a non-technical audience.",
+    "answerPatterns": ["technical", "audience"]
+  },
+  {
+    "id": "test-olmo-eval",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 4,
+    "query": "How often does OLMo run online evaluation during training?",
+    "passage": "every 1000 training steps",
+    "expectedAnswer": "Online evaluation runs every 1000 training steps, about 4B training tokens.",
+    "answerPatterns": ["1000"]
+  },
+  {
+    "id": "test-olmo-paloma",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 4,
+    "query": "How many domains of text does Paloma include?",
+    "passage": "585 different domains",
+    "expectedAnswer": "Paloma includes 585 domains drawn from 18 data sources.",
+    "answerPatterns": ["585"]
+  },
+  {
+    "id": "test-olmo-fsdp",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 4,
+    "query": "How does OLMo FSDP reduce memory consumption?",
+    "passage": "sharding the model weights",
+    "expectedAnswer": "It shards model weights and the corresponding optimizer state across GPUs.",
+    "answerPatterns": ["sharding", "optimizer state"]
+  },
+  {
+    "id": "test-olmo-adamw",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 5,
+    "query": "Which optimizer is used to train OLMo?",
+    "passage": "We use the AdamW optimizer",
+    "expectedAnswer": "OLMo uses AdamW.",
+    "answerPatterns": ["adamw"]
+  },
+  {
+    "id": "test-olmo-eos",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 5,
+    "query": "What special token is appended to each document in OLMo training data?",
+    "passage": "a special EOS token",
+    "expectedAnswer": "An EOS token is appended to each document before concatenation.",
+    "answerPatterns": ["eos"]
+  },
+  {
+    "id": "test-olmo-lumi",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 5,
+    "query": "Which AMD GPUs were used on LUMI for OLMo?",
+    "passage": "AMD MI250X GPUs",
+    "expectedAnswer": "LUMI nodes contain four AMD MI250X GPUs with 128GB memory.",
+    "answerPatterns": ["mi250x"]
+  },
+  {
+    "id": "test-pile-subtitles",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 5,
+    "query": "What does OpenSubtitles provide to the Pile?",
+    "passage": "subtitles from movies and television",
+    "expectedAnswer": "It provides English subtitles from movies and television shows, a source of natural dialogue.",
+    "answerPatterns": ["movies", "television"]
+  },
+  {
+    "id": "test-pile-math",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 5,
+    "query": "Why include DeepMind Mathematics in the Pile?",
+    "passage": "improve the mathematical ability",
+    "expectedAnswer": "The authors hope to improve mathematical ability by including math problems.",
+    "answerPatterns": ["mathematical ability"]
+  },
+  {
+    "id": "test-pile-europarl",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 5,
+    "query": "Which years of European Parliament proceedings are in EuroParl?",
+    "passage": "1996 until 2012",
+    "expectedAnswer": "The paper uses proceedings from 1996 until 2012 in 21 European languages.",
+    "answerPatterns": ["1996", "2012"]
+  },
+  {
+    "id": "test-pile-split",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 6,
+    "query": "How are the validation and testing components sampled in the Pile?",
+    "passage": "sampled uniformly at random",
+    "expectedAnswer": "Each contains 0.1 percent of the data, sampled uniformly at random.",
+    "answerPatterns": ["uniformly", "random"]
+  },
+  {
+    "id": "test-pile-metric",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 6,
+    "query": "Why is bits per byte preferred over perplexity for the Pile?",
+    "passage": "invariance to different tokenization",
+    "expectedAnswer": "Bits per byte is invariant to tokenization schemes and avoids ambiguity in Unicode character counts.",
+    "answerPatterns": ["invariance", "tokenization"]
+  },
+  {
+    "id": "test-pile-enron",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 6,
+    "query": "Why were Enron Emails included in the Pile?",
+    "passage": "understanding the modality of email",
+    "expectedAnswer": "To help understand email communication, a modality absent from its other datasets.",
+    "answerPatterns": ["email", "communications"]
+  },
+  {
+    "id": "negative-medical",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 1,
+    "query": "What dosage cures pancreatic cancer?",
+    "passage": "",
+    "expectedAnswer": "Refuse: these papers provide no medical dosage recommendation.",
+    "answerPatterns": [],
+    "negative": true
+  },
+  {
+    "id": "negative-patients",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 1,
+    "query": "How many pediatric patients were enrolled in the OLMo clinical trial?",
+    "passage": "",
+    "expectedAnswer": "Refuse: OLMo is not a pediatric clinical trial.",
+    "answerPatterns": [],
+    "negative": true
+  },
+  {
+    "id": "negative-pile-random",
+    "split": "test",
+    "paperId": "2101.00027v1",
+    "page": 1,
+    "query": "What is the secret administrator password for the Pile database?",
+    "passage": "",
+    "expectedAnswer": "Refuse: no password is in the provided evidence.",
+    "answerPatterns": [],
+    "negative": true
+  },
+  {
+    "id": "negative-optimizer-premise",
+    "split": "test",
+    "paperId": "2402.00838v4",
+    "page": 5,
+    "query": "Why does OLMo use the SGD optimizer instead of AdamW?",
+    "passage": "",
+    "expectedAnswer": "Reject the false premise or refuse: OLMo uses AdamW, not SGD.",
+    "answerPatterns": [],
+    "negative": true
+  }
+]

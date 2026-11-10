@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-11-10T14:20:58.792Z",
+  "source": "https://arxiv.org/abs/1706.03762v7",
+  "pdfSha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697",
+  "indexVersion": 3,
+  "kindCountsByPage": [
+    {
+      "page": 10,
+      "kinds": {
+        "table": 1,
+        "text": 4,
+        "references": 1
+      }
+    },
+    {
+      "page": 11,
+      "kinds": {
+        "references": 5
+      }
+    },
+    {
+      "page": 12,
+      "kinds": {
+        "references": 5
+      }
+    },
+    {
+      "page": 13,
+      "kinds": {
+        "text": 5,
+        "figure": 1
+      }
+    },
+    {
+      "page": 14,
+      "kinds": {
+        "text": 3,
+        "figure": 1
+      }
+    },
+    {
+      "page": 15,
+      "kinds": {
+        "text": 3,
+        "figure": 1
+      }
+    }
+  ],
+  "attentionSection": [
+    "3 Model Architecture",
+    "3.2 Attention",
+    "3.2.1 Scaled Dot-Product Attention"
+  ],
+  "refused": false,
+  "sentences": [
+    {
+      "text": "We compute the dot products of the , and apply a softmax function to obtain the weights on the query with all keys, divide each by d k values.",
+      "citations": [
+        {
+          "page": 4,
+          "rectCount": 8
+        }
+      ]
+    },
+    {
+      "text": "While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.",
+      "citations": [
+        {
+          "page": 4,
+          "rectCount": 3
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Offline mock: token-hash vectors are not semantic embeddings.",
+    "Offline mock: extractive English only; translation and simplification require a real provider.",
+    "Offline mock: lexical sentence and section heuristics reject headings; they do not establish answer completeness."
+  ]
+}

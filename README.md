@@ -35,10 +35,56 @@ Copy optional variables from `.env.example` into untracked `.env.local`, or inje
 
 Local mode is explicit, restricted to loopback, and uses one development workspace. For hosted use, remove `APP_MODE=local`, configure Clerk, and set Convex `ALLOW_LOCAL_AUTH=false`. Set `CLERK_JWT_ISSUER_DOMAIN` in Convex and create the Clerk JWT template named `convex`. The real Clerk flow requires your Clerk keys and cannot be verified without them. Do not deploy the local-mode configuration.
 
-Required for real generation: an OpenAI-compatible/OpenRouter API key and model. Embeddings may use a separate endpoint/key/model. Optional metadata credentials are Semantic Scholar API key and Unpaywall contact email; Crossref and arXiv work without keys. No secrets are committed or sent to client components.
+Required for real generation: an OpenAI-compatible/OpenRouter API key and model. Embeddings may use a separate endpoint/key/model. The optional Unpaywall contact email enables more open-access sources; Crossref and arXiv work without keys. No secrets are committed or sent to client components.
 
 ## Verification evidence
 
 Initial ingestion checks cover real PDF text and coordinates, numeric/author-year references, public URL boundaries, authentication fallback, storage bytes, duplicate imports, reading state, annotations, glossary, collection cleanup, and chat history. Full product and retrieval evaluation evidence will be recorded here after integration.
 
 See `docs/architecture.md`, `FEATURES.md`, and `logbook.md` for current scope and decisions.
+
+## Retrieval evaluation
+
+<!-- rag-eval:start -->
+
+| Ablation                     | Recall@5 | MRR@5 | nDCG@5 | Extractive faithfulness | Expected-answer match | Negative refusal |
+| ---------------------------- | -------: | ----: | -----: | ----------------------: | --------------------: | ---------------: |
+| BM25-only                    |    91.7% | 0.808 |  0.835 |                  100.0% |                 91.7% |           100.0% |
+| Dense-only (hash mock)       |    75.0% | 0.611 |  0.647 |                  100.0% |                 75.0% |           100.0% |
+| Hybrid                       |    91.7% | 0.736 |  0.783 |                  100.0% |                 91.7% |           100.0% |
+| Hybrid + contextual          |   100.0% | 0.861 |  0.897 |                  100.0% |                100.0% |           100.0% |
+| Hybrid + contextual + rerank |   100.0% | 0.958 |  0.969 |                  100.0% |                100.0% |           100.0% |
+
+<!-- rag-eval:end -->
+
+This deterministic offline regression uses two real CC BY 4.0 arXiv papers, OLMo and The Pile, with 98 chunks from their first six pages. Eight development questions select BM25 k1/b; twelve different positive questions and four negatives form the regression set. The selected defaults are k1=1.2, b=0.75 because the development grid tied. TF-IDF cosine and RRF are separate stages. Query rewrite, multi-query, HyDE, and parent expansion are disabled equally in this ablation to isolate the listed components; their mechanics have separate tests.
+
+The full configuration must pass every fixed expected-passage and expected-answer judgment, refuse all negatives, and preserve exact source support. The eval saves failure evidence and exits nonzero if that release gate fails. Sentence-boundary regressions cover spaced decimals, author abbreviations, line hyphenation, and naming clauses that also explain behavior. Judgments were not changed to accommodate failures.
+
+These metrics describe an extractive token-hash mock. They do not establish learned semantic retrieval, multilingual quality, or real-model entailment. Exact extraction makes quote faithfulness easier than generated-answer faithfulness. The corpus is small, shares papers across development and test, and was reused during bug fixing. See [the protocol and limits](docs/rag-evaluation.md) and [per-question results with file hashes](artifacts/rag-evaluation.json).
+
+## Configure a compatible model
+
+Set `LLM_PROVIDER=openai-compatible`, `LLM_BASE_URL`, `LLM_MODEL`, and `LLM_API_KEY`. OpenAI and OpenRouter HTTPS hosts are supported by default. Other HTTPS APIs require an explicit server-side `LLM_TRUSTED_HOSTS` comma-separated allowlist. Requests cannot change hosts or models. A different embedding provider requires its own `EMBEDDING_API_KEY`; keys are not silently forwarded between provider origins.
+
+Set `EMBEDDING_BASE_URL` and `EMBEDDING_MODEL` when embeddings use another API. The local Convex index uses 256 dimensions. Choose a model supporting that dimension. `EMBEDDING_SEND_DIMENSIONS=false` supports APIs whose fixed model dimension is already 256 and reject the dimensions parameter. Changing dimensions requires migrating the vector schema and rebuilding indexes, never padding or truncating stored vectors.
+
+`LLM_PROMPT_CACHE=anthropic` enables explicit supported OpenRouter Anthropic cache markers. Contextualization uses a stable original-paper prefix followed by changing chunk data. Short papers may not meet model thresholds. No cache hit rate or cost saving is claimed.
+
+The available Infisical login has no project for this app. After creating or authorizing a project, inject its selected development environment and folder into the app process:
+
+```sh
+infisical secrets-manager run --domain=https://secrets.buildwithkuro.tech \
+  --projectId="$INFISICAL_PROJECT_ID" --env="$INFISICAL_ENV" \
+  --path="$INFISICAL_SECRET_PATH" -- bun run dev
+```
+
+Do not print the injected environment. Production Clerk requires `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and the Convex `CLERK_JWT_ISSUER_DOMAIN`. Optional `UNPAYWALL_EMAIL` enables more open-access PDF resolution. Crossref and arXiv need no API key.
+
+## Prepare offline import and layout fixtures
+
+```sh
+bun scripts/cache-import-fixtures.ts
+```
+
+This downloads and checksum-checks real public metadata and PDF bytes once into ignored `.data/import-fixtures`. The real-PDF layout regression uses this cache. Unit tests, the checked-in CC BY retrieval corpus, and the configured mock never require a paid key. For offline browser imports, start the local app with `IMPORT_FIXTURE_CACHE_DIR` pointing at that prepared cache. A missing source fails explicitly; it never becomes a synthetic paper.

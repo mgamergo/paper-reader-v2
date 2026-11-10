@@ -1,5 +1,13 @@
 # Logbook
 
+## 2026-11-10 • Advanced RAG release gate
+
+- RAG worker delivered contextual indexing, layout-aware parent/child chunks, BM25/TF-IDF/dense/RRF stages, query expansion/HyDE, reranking, filters/graph expansion, exact source checks and real-paper evaluation. Index format3; offline embedding revision3, 256dimensions.
+- Fixed three unchanged judgment failures: decimal and author-abbreviation sentence boundaries, line-hyphen lexical matching, and overbroad naming-clause rejection. Added focused regressions and a full unchanged-judgment integration test. Eval now exits nonzero for any full-pipeline passage/answer/refusal/support failure.
+- Latest complete test run: 91pass, 0fail, 404assertions across18files. Project strict typecheck and global ESLint passed. Vendored generated PDF worker is excluded from source lint; PostCSS export and shared formatting corrected.
+- Latest full RAG configuration: recall@5=1, MRR@5=0.958333, nDCG@5=0.969244, extractive quote faithfulness=1, expected-answer match=1, negative refusal=1. Twelve fixed positives/four negatives, two real CC BY papers, 98chunks. These are small-corpus hash/extractive mock regressions, not real semantic/multilingual quality. Baseline ablations and exact source/file hashes retained.
+- Browser acceptance delegate owns the only browser/test worker. Production app remains the previously built artifact; the current RAG changes still require final production rebuild and full browser rerun after acceptance fixes.
+
 ## 2026-11-10 • Ownership, vector scopes, and production reader integration
 
 - Backend feature 46b1e4e is pushed. RAG adapter now persists contextual index manifests and queries actual Convex vector search; contextual/BM25/TF-IDF/dense/RRF/rerank stages appear in API debug. Integration tests verify quote/page rectangles and unsupported refusal. Core RAG source/eval delegate is still finishing its owned paths.

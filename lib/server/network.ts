@@ -1,6 +1,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import ipaddr from "ipaddr.js";
+import { readImportFixture } from "./import-cache";
 import http from "node:http";
 import https from "node:https";
 export class ImportError extends Error {
@@ -63,6 +64,26 @@ export async function fetchPublicResource(
   if (redirects > 4)
     throw new ImportError("The source redirected too many times.");
   const url = validatePublicUrl(source);
+  if (process.env.IMPORT_FIXTURE_CACHE_DIR) {
+    if (process.env.APP_MODE !== "local")
+      throw new ImportError(
+        "Import fixtures are restricted to local development.",
+        503,
+      );
+    try {
+      return await readImportFixture(
+        process.env.IMPORT_FIXTURE_CACHE_DIR,
+        url.href,
+        options.maxBytes ?? 25 * 1024 * 1024,
+      );
+    } catch {
+      throw new ImportError(
+        "This public source is not in the offline import fixture cache. Prepare fixtures or disable IMPORT_FIXTURE_CACHE_DIR.",
+        503,
+      );
+    }
+  }
+
   const hostname = url.hostname.replace(/^\[|\]$/g, "");
   const addresses = isIP(hostname)
     ? [{ address: hostname, family: isIP(hostname) }]

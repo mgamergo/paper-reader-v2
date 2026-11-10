@@ -4,9 +4,15 @@ import { api } from "@/convex/_generated/api";
 import { requestClient, apiError } from "@/lib/server/api";
 import { importPaper } from "@/lib/server/import";
 import {
+  askLibrary,
+  persistedIndex,
+  configuredProvider,
+} from "@/lib/server/rag";
+import {
   ImportError,
   readJsonBody,
   readRequestBytes,
+  fetchPublicResource,
 } from "@/lib/server/network";
 import { enrichReference } from "@/lib/server/metadata";
 import {
@@ -57,9 +63,43 @@ async function handle(request: Request, context: Context): Promise<Response> {
           .object({ source: z.string().min(1).max(2000) })
           .parse(await readJsonBody(request)).source;
       const paper = await importPaper({ client, token, file, source });
-      return Response.json(paper, { status: 201 });
+      try {
+        await persistedIndex(client, [paper], configuredProvider());
+        await client.mutation(api.workspace.patchPaper, {
+          paperId: paper.id,
+          json: JSON.stringify({ status: "ready", error: "" }),
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Indexing failed";
+        await client.mutation(api.workspace.patchPaper, {
+          paperId: paper.id,
+          json: JSON.stringify({
+            status: "error",
+            error: message.slice(0, 300),
+          }),
+        });
+      }
+      return Response.json(
+        paperSchema.parse(
+          await client.query(api.workspace.getPaper, { paperId: paper.id }),
+        ),
+        { status: 201 },
+      );
     }
     if (resource === "papers" && id) {
+      if (child === "reindex" && method === "POST") {
+        const paper = paperSchema.parse(
+          await client.query(api.workspace.getPaper, { paperId: id }),
+        );
+        await client.mutation(api.workspace.clearIndex, { paperId: id });
+        await persistedIndex(client, [paper], configuredProvider());
+        await client.mutation(api.workspace.patchPaper, {
+          paperId: id,
+          json: JSON.stringify({ status: "ready", error: "" }),
+        });
+        return Response.json({ ok: true });
+      }
       if (child === "pdf" && method === "GET") {
         const storageUrl = await client.query(api.workspace.pdfUrl, {
           paperId: id,
@@ -217,6 +257,36 @@ async function handle(request: Request, context: Context): Promise<Response> {
       const paperId = z.string().min(1).parse(url.searchParams.get("paperId"));
       return Response.json(await client.query(api.workspace.chat, { paperId }));
     }
+    if (resource === "reference-preview" && method === "GET") {
+      const paperId = z.string().min(1).parse(url.searchParams.get("paperId"));
+      const referenceId = z
+        .string()
+        .min(1)
+        .parse(url.searchParams.get("referenceId"));
+      const paper = paperSchema.parse(
+        await client.query(api.workspace.getPaper, { paperId }),
+      );
+      const reference = paper.references.find((ref) => ref.id === referenceId);
+      if (!reference?.pdfUrl)
+        throw new ImportError(
+          "No open PDF preview is available for this reference.",
+          404,
+        );
+      const preview = await fetchPublicResource(reference.pdfUrl);
+      if (
+        !new TextDecoder()
+          .decode(preview.bytes.slice(0, 1024))
+          .includes("%PDF-")
+      )
+        throw new ImportError("This source did not return a PDF preview.", 422);
+      return new Response(new Uint8Array(preview.bytes), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Cache-Control": "private, max-age=600",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    }
     if (resource === "references" && method === "GET") {
       const paperId = z.string().min(1).parse(url.searchParams.get("paperId"));
       const referenceId = z
@@ -245,7 +315,58 @@ async function handle(request: Request, context: Context): Promise<Response> {
       const input = assistRequestSchema.parse(await readJsonBody(request));
       if (!input.paperId && !input.collectionId)
         throw new ImportError("Choose a paper or collection first.");
-      throw new ImportError("The retrieval service is being configured.", 503);
+      const library = librarySchema.parse(
+        await client.query(api.workspace.library, {}),
+      );
+      const historyKey = input.collectionId
+        ? `collection:${input.collectionId}`
+        : input.paperId;
+      if (!historyKey) throw new ImportError("Choose a paper or collection.");
+      const history = await client.query(api.workspace.chat, {
+        paperId: historyKey,
+      });
+      const previous = history
+        .filter((message) => message.role === "user")
+        .slice(-2)
+        .map((message) => message.text);
+      const retrievalRequest = {
+        ...input,
+        query:
+          previous.length &&
+          /^(what about|and |how about|why |can you elaborate|explain more|it |this |that )/i.test(
+            input.query,
+          )
+            ? `${previous.join("\n")}\nFollow-up: ${input.query}`
+            : input.query,
+      };
+      const answer = await askLibrary({
+        client,
+        papers: library.papers,
+        request: retrievalRequest,
+      });
+      const time = Date.now();
+      await client.mutation(api.workspace.addMessages, {
+        json: JSON.stringify([
+          {
+            id: randomUUID(),
+            paperId: historyKey,
+            role: "user",
+            text: input.query,
+            createdAt: time,
+          },
+          {
+            id: randomUUID(),
+            paperId: historyKey,
+            role: "assistant",
+            text: answer.refused
+              ? "This is not supported by the paper."
+              : answer.sentences.map((sentence) => sentence.text).join(" "),
+            answer,
+            createdAt: time + 1,
+          },
+        ]),
+      });
+      return Response.json(answer);
     }
     throw new ImportError("This endpoint was not found.", 404);
   } catch (error) {

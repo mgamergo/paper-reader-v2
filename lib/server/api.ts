@@ -3,6 +3,7 @@ import { ConvexHttpClient } from "convex/browser";
 import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { ImportError } from "./network";
+import { RagError } from "../rag";
 export async function requestClient(
   request: Request,
 ): Promise<{ client: ConvexHttpClient; token: string | null }> {
@@ -47,6 +48,20 @@ export async function requestClient(
   return { client, token };
 }
 export function apiError(error: unknown): Response {
+  if (error instanceof RagError)
+    return Response.json(
+      { error: error.message },
+      {
+        status:
+          error.code === "configuration"
+            ? 503
+            : error.code === "provider"
+              ? 502
+              : error.code === "limit"
+                ? 413
+                : 400,
+      },
+    );
   if (error instanceof ImportError)
     return Response.json({ error: error.message }, { status: error.status });
   if (error instanceof z.ZodError)
