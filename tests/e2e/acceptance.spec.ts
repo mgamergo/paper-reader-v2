@@ -296,6 +296,22 @@ test("multicolor annotation CRUD, bookmark, persistence and downloaded exports",
     .locator(".annotation-card")
     .getByRole("button", { name: "Delete", exact: true })
     .click();
+  const confirm = page.getByRole("dialog", {
+    name: "Delete annotation?",
+    exact: true,
+  });
+  await expect(confirm).toBeVisible();
+  expect(await annotations(request, owned.paper.id)).toHaveLength(3);
+  await confirm.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.locator(".annotation-card")).toHaveCount(1);
+  await page
+    .locator(".annotation-card")
+    .getByRole("button", { name: "Delete", exact: true })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Delete annotation?", exact: true })
+    .getByRole("button", { name: "Delete permanently", exact: true })
+    .click();
   await expect(page.locator(".annotation-card")).toHaveCount(0);
   expect(await annotations(request, owned.paper.id)).toHaveLength(2);
 });
@@ -538,6 +554,26 @@ test("glossary save edit delete and persisted flashcard grade", async ({
       name: `Delete glossary term ${term.term}`,
       exact: true,
     })
+    .click();
+  const confirm = page.getByRole("dialog", {
+    name: "Delete glossary term?",
+    exact: true,
+  });
+  await expect(confirm).toBeVisible();
+  expect(
+    (await library(request)).glossary.some((word) => word.id === entry?.id),
+  ).toBe(true);
+  await confirm.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.locator(".glossary-card")).toHaveCount(1);
+  await page
+    .getByRole("button", {
+      name: `Delete glossary term ${term.term}`,
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Delete glossary term?", exact: true })
+    .getByRole("button", { name: "Delete permanently", exact: true })
     .click();
   await expect(page.locator(".glossary-card")).toHaveCount(0);
   expect(
@@ -797,6 +833,26 @@ test("seeded glossary edit delete and persisted flashcard grade", async ({
       name: `Delete glossary term ${term.term}`,
       exact: true,
     })
+    .click();
+  const confirm = page.getByRole("dialog", {
+    name: "Delete glossary term?",
+    exact: true,
+  });
+  await expect(confirm).toBeVisible();
+  expect(
+    (await library(request)).glossary.some((word) => word.id === entry?.id),
+  ).toBe(true);
+  await confirm.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.locator(".glossary-card")).toHaveCount(1);
+  await page
+    .getByRole("button", {
+      name: `Delete glossary term ${term.term}`,
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Delete glossary term?", exact: true })
+    .getByRole("button", { name: "Delete permanently", exact: true })
     .click();
   await expect(page.locator(".glossary-card")).toHaveCount(0);
   expect(

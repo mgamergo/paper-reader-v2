@@ -1114,7 +1114,7 @@ function AnnotationsPanel({
 }) {
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Annotation | null>(null);
-  const [busy, setBusy] = useState("");
+  const [deleting, setDeleting] = useState<Annotation | null>(null);
   return (
     <div className="annotations-panel">
       <div className="export-buttons">
@@ -1179,18 +1179,7 @@ function AnnotationsPanel({
             </div>
             <div className="form-row">
               <Button onClick={() => setEditing(a)}>Edit</Button>
-              <Button
-                className="danger"
-                disabled={busy === a.id}
-                onClick={() => {
-                  setBusy(a.id);
-                  void api
-                    .deleteAnnotation(a.id)
-                    .then(refresh)
-                    .catch((e) => onError(errorMessage(e)))
-                    .finally(() => setBusy(""));
-                }}
-              >
+              <Button className="danger" onClick={() => setDeleting(a)}>
                 Delete
               </Button>
             </div>
@@ -1204,6 +1193,22 @@ function AnnotationsPanel({
           </p>
         </Empty>
       )}
+      <ConfirmDeletion
+        open={!!deleting}
+        title="Delete annotation?"
+        description="This permanently removes the saved highlight, note, or bookmark."
+        onClose={() => setDeleting(null)}
+        onDelete={async () => {
+          if (!deleting) return;
+          try {
+            await api.deleteAnnotation(deleting.id);
+            await refresh();
+          } catch (error) {
+            onError(errorMessage(error));
+            throw error;
+          }
+        }}
+      />
       {editing && (
         <AnnotationDialog
           key={editing.id}
@@ -1227,6 +1232,7 @@ function GlossaryPanel({
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<GlossaryEntry | null>(null);
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState<GlossaryEntry | null>(null);
   async function save() {
     if (!editing) return;
     setBusy(true);
@@ -1279,12 +1285,7 @@ function GlossaryPanel({
               <Button onClick={() => setEditing(entry)}>Edit</Button>
               <IconButton
                 label={`Delete glossary term ${entry.term}`}
-                onClick={() =>
-                  void api
-                    .deleteGlossary(entry.id)
-                    .then(refresh)
-                    .catch((e) => onError(errorMessage(e)))
-                }
+                onClick={() => setDeleting(entry)}
               >
                 <Trash2 size={15} />
               </IconButton>
@@ -1299,6 +1300,17 @@ function GlossaryPanel({
           </p>
         </Empty>
       )}
+      <ConfirmDeletion
+        open={!!deleting}
+        title="Delete glossary term?"
+        description={`This permanently removes “${deleting?.term ?? "this term"}” and its flashcard review history.`}
+        onClose={() => setDeleting(null)}
+        onDelete={async () => {
+          if (!deleting) return;
+          await api.deleteGlossary(deleting.id);
+          await refresh();
+        }}
+      />
       <Modal
         open={!!editing}
         onOpenChange={(open) => {
@@ -1480,4 +1492,62 @@ function Flashcards({
   function gradeRecall(value: string | number) {
     return grade(Number(value));
   }
+}
+
+function ConfirmDeletion({
+  open,
+  title,
+  description,
+  onClose,
+  onDelete,
+}: {
+  open: boolean;
+  title: string;
+  description: string;
+  onClose: () => void;
+  onDelete: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  return (
+    <Modal
+      open={open}
+      title={title}
+      description={description}
+      onOpenChange={(next) => {
+        if (!next && !busy) {
+          setError("");
+          onClose();
+        }
+      }}
+    >
+      {error && <ErrorBox message={error} />}
+      <div className="form-row">
+        <Button
+          disabled={busy}
+          onClick={() => {
+            setError("");
+            onClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="danger"
+          disabled={busy}
+          onClick={() => {
+            if (busy) return;
+            setBusy(true);
+            setError("");
+            void onDelete()
+              .then(onClose)
+              .catch((failure) => setError(errorMessage(failure)))
+              .finally(() => setBusy(false));
+          }}
+        >
+          {busy ? "Deleting…" : "Delete permanently"}
+        </Button>
+      </div>
+    </Modal>
+  );
 }
