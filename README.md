@@ -4,6 +4,8 @@ A research reader for people reading papers in a second language. Contextual exp
 
 The complete local reader and advanced retrieval pipeline are implemented. `FEATURES.md` records pass/fail by feature and shortcut. Production authentication and generated multilingual quality require your keys and a separate live-provider acceptance run.
 
+The UI uses shadcn/ui’s owned-component pattern with Radix primitives, a CVA/Slot Button and `cn`, configured in `components.json`; the reader retains its own accessible CSS tokens. See the [upstream Button pattern](https://github.com/shadcn-ui/ui/blob/main/apps/v4/registry/new-york-v4/ui/button.tsx) and retained MIT notice.
+
 ## Run locally
 
 Use Bun 1.4.4, Node 22.23 or newer, and Linux/macOS. No paid model key is required for the deterministic offline provider.
@@ -79,7 +81,7 @@ infisical secrets-manager run --domain=https://secrets.buildwithkuro.tech \
   --path="$INFISICAL_SECRET_PATH" -- bun run dev
 ```
 
-Do not print the injected environment. Production Clerk requires `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and the Convex `CLERK_JWT_ISSUER_DOMAIN`. Optional `UNPAYWALL_EMAIL` enables more open-access PDF resolution. Crossref and arXiv need no API key.
+Do not print the injected environment. Production Clerk requires `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and the Convex `CLERK_JWT_ISSUER_DOMAIN`. Supply the Next keys during both build and server startup; public values are compiled into client bundles. Configured hosted mode redirects signed-out readers to `/sign-in`, supports `/sign-up`, and provides account/sign-out controls. Without keys, hosted mode shows an unavailable state and denies library data. Those missing-key boundaries are browser-tested; real Clerk sign-in/out is not. Optional `UNPAYWALL_EMAIL` enables more open-access PDF resolution. Crossref and arXiv need no API key.
 
 ## Prepare offline import and layout fixtures
 

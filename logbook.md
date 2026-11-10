@@ -1,5 +1,13 @@
 # Logbook
 
+## 2026-11-10 • Functionality approval and UI stack
+
+Functionality/security/RAG sol-loop approved after three rounds. Both reviewer findings and five parent audit items are resolved; no findings declined. Full119tests/559assertions, unchanged real-paper evaluation, production build, and35browser cases passed before the UI stack change. Each of five source feature commits was pushed and remote equality verified, ending at700259f. Added the requested shadcn/ui owned Button/CVA/Slot/cn pattern and components.json, preserving reader CSS and upstream MIT notice. Its complete source gate and35/35browser cases passed on build ozyHqafgvciYio2xE1RZZ, source fingerprint ff84880b4f0c567857d7fbd5a8f8d52e3de1c36dced03cdaf53365dd103f3ead. Separate UI/UX review follows.
+
+## 2026-11-10 • Functionality review fixes
+
+Sol round1 found incoming-Host authorization and glossary-review reset bugs. Fixed both; source tests cover actual local Convex resave persistence and the running Next authority guard. Parent audit also fixed related-work bibliography scope, selected-section summaries, hosted account entry/controls, and collection conversation continuity through cross-paper source jumps. Contextual Explain remains scoped to the reader even when collection chat is selected. Source115tests/541assertions and full32/34-case browser runs passed before the last cross-paper change; focused distinct-source case passes. Complete35-case run and Sol round2 pending. No pushes during review loop; current changes intentionally uncommitted until agreement.
+
 ## 2026-11-10 • Extended acceptance
 
 Twelve additional browser cases passed on the fresh production build: DOI/URL imports, drag-drop, invalid/oversized/scanned imports and retry, citation groups/ranges/author-year/superscripts/unresolved, transformed highlight alignment, all assistant action protocols, filters, keyboard controls, Hindi paired-citation UI protocol and mobile import bounds. Hindi is an explicitly manual protocol fixture, not generated model quality. Expected resource console errors are allowed only for exact predeclared HTTP400 import validation cases. Other diagnostics stay strict. Headings now live in section metadata rather than answer text; index format4 forces rebuild. Private local export including files passed ZIP integrity; restore untested. Full 31-case release run and both independent reviews are next.
