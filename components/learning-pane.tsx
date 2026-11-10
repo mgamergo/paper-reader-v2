@@ -994,6 +994,7 @@ export function AnnotationDialog({
   onSaved: () => Promise<void>;
 }) {
   const [value, setValue] = useState(draft);
+  const [tags, setTags] = useState(draft?.tags.join(", ") ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   if (!value) return null;
@@ -1002,7 +1003,17 @@ export function AnnotationDialog({
     setBusy(true);
     setError("");
     try {
-      await api.saveAnnotation(value);
+      await api.saveAnnotation({
+        ...value,
+        tags: [
+          ...new Set(
+            tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+          ),
+        ],
+      });
       await onSaved();
       onClose();
     } catch (e) {
@@ -1078,18 +1089,7 @@ export function AnnotationDialog({
         </label>
         <label>
           Tags (comma separated)
-          <input
-            value={value.tags.join(",")}
-            onChange={(e) =>
-              setValue({
-                ...value,
-                tags: e.target.value
-                  .split(",")
-                  .map((t) => t.trim())
-                  .filter(Boolean),
-              })
-            }
-          />
+          <input value={tags} onChange={(e) => setTags(e.target.value)} />
         </label>
         {error && <ErrorBox message={error} />}
         <Button className="primary" type="submit" disabled={busy}>

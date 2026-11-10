@@ -235,7 +235,7 @@ test("multicolor annotation CRUD, bookmark, persistence and downloaded exports",
       .fill(`Acceptance ${color} comment`);
     await dialog
       .getByLabel("Tags (comma separated)")
-      .fill("acceptance, selected");
+      .pressSequentially("acceptance, selected");
     await dialog
       .getByRole("button", { name: "Save annotation", exact: true })
       .click();
@@ -246,6 +246,10 @@ test("multicolor annotation CRUD, bookmark, persistence and downloaded exports",
   }
   const records = await annotations(request, owned.paper.id);
   expect(records).toHaveLength(2);
+  expect(records.map((record) => record.tags)).toEqual([
+    ["acceptance", "selected"],
+    ["acceptance", "selected"],
+  ]);
   expect(
     records.every((a) => a.rects.length > 0 && a.text.includes("Attention")),
   ).toBe(true);
