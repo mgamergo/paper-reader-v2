@@ -344,11 +344,35 @@ test("assistant actions keep selected paper context and support copy and save-to
       `extended-${action}`,
     );
     expect(result.request.action).toBe(action);
+    expect(result.request.selection?.rects?.length).toBeGreaterThan(0);
     expect(result.request.paperId).toBe(owned.paper.id);
     expect(result.request.selection?.context).toContain(
       "Attention is a mechanism",
     );
     expect(result.answer.provider).toMatch(/offline|mock/i);
+    if (action === "related") {
+      expect(result.answer.refused).toBe(false);
+      expect(
+        result.answer.sentences.map((sentence) => sentence.text).join(" "),
+      ).toContain("Attention Is All You Need");
+      expect(
+        result.answer.debug.hits.every(
+          (hit) => hit.chunk.kind === "references",
+        ),
+      ).toBe(true);
+      expect(result.answer.debug.stages).toContain(
+        "related-bibliography-scope",
+      );
+    }
+    if (action === "summarize") {
+      expect(result.answer.debug.filters.section).toBe("Abstract");
+      expect(
+        result.answer.debug.hits.every((hit) =>
+          hit.chunk.sectionPath.includes("Abstract"),
+        ),
+      ).toBe(true);
+    }
+
     for (const sentence of result.answer.sentences) {
       expect(sentence.citations.length).toBeGreaterThan(0);
       expect(
@@ -740,4 +764,19 @@ test("remapped dismissal closes modals while physical Escape remains an availabl
   await expect(help.locator(".shortcut-row")).toContainText("Alt+q");
   await page.keyboard.press("Escape");
   await expect(help).toBeHidden();
+});
+
+test("local authorization validates incoming authority through the running Next server", async ({
+  request,
+}) => {
+  const valid = await request.get("/api/library");
+  expect(valid.status()).toBe(200);
+  const invalid = await request.get("/api/library", {
+    headers: { host: "review.invalid:3000" },
+  });
+  expect(invalid.status()).toBe(403);
+  expect(await invalid.json()).toEqual({
+    error:
+      "Local workspace mode is restricted to loopback. Configure Clerk for hosted access.",
+  });
 });

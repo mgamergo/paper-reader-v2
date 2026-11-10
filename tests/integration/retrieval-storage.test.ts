@@ -10,7 +10,8 @@ import {
   persistedIndex,
   configuredProvider,
 } from "../../lib/server/rag";
-import { assistRequestSchema } from "../../lib/domain";
+import { MockProvider, answerQuestion } from "../../lib/rag";
+import { assistRequestSchema, paperSchema } from "../../lib/domain";
 test("persisted contextual chunks feed real Convex vector search and grounded answers", async () => {
   const client = new ConvexHttpClient(
     process.env.NEXT_PUBLIC_CONVEX_URL ?? "http://127.0.0.1:3210",
@@ -94,6 +95,75 @@ test("persisted contextual chunks feed real Convex vector search and grounded an
       }),
     });
     expect(unsupported.refused).toBe(true);
+  } finally {
+    if (paperId) await client.mutation(api.workspace.deletePaper, { paperId });
+  }
+}, 60000);
+
+test("resolved citation metadata reuses stored embeddings while source title changes rebuild", async () => {
+  const client = new ConvexHttpClient(
+    process.env.NEXT_PUBLIC_CONVEX_URL ?? "http://127.0.0.1:3210",
+  );
+  class Counted extends MockProvider {
+    contexts = 0;
+    override async contextualize(
+      input: Parameters<MockProvider["contextualize"]>[0],
+    ) {
+      this.contexts++;
+      return super.contextualize(input);
+    }
+  }
+  const provider = new Counted();
+  const pdf = await PDFDocument.load(await makeReaderFixture());
+  pdf.setProducer(`cache-integration-${randomUUID()}`);
+  let paperId: string | undefined;
+  try {
+    const paper = await importPaper({
+      client,
+      token: null,
+      file: new File([new Uint8Array(await pdf.save())], "cache.pdf", {
+        type: "application/pdf",
+      }),
+    });
+    paperId = paper.id;
+    const initial = await persistedIndex(client, [paper], provider);
+    const calls = provider.contexts;
+    expect(calls).toBe(initial.chunks.length);
+    await client.mutation(api.workspace.patchPaper, {
+      paperId,
+      json: JSON.stringify({
+        references: paper.references.map((reference) => ({
+          ...reference,
+          abstract:
+            "Resolved bibliographic metadata for the authored cache regression.",
+        })),
+      }),
+    });
+    const resolved = paperSchema.parse(
+      await client.query(api.workspace.getPaper, { paperId }),
+    );
+    const cached = await persistedIndex(client, [resolved], provider);
+    expect(provider.contexts).toBe(calls);
+    expect(cached).toEqual(initial);
+    const answer = await answerQuestion({
+      papers: [resolved],
+      index: cached,
+      provider,
+      request: assistRequestSchema.parse({
+        paperId,
+        query: "What does attention do in machine learning?",
+      }),
+    });
+    expect(answer.refused).toBe(false);
+    await client.mutation(api.workspace.patchPaper, {
+      paperId,
+      json: JSON.stringify({ title: "Corrected source title" }),
+    });
+    const retitled = paperSchema.parse(
+      await client.query(api.workspace.getPaper, { paperId }),
+    );
+    await persistedIndex(client, [retitled], provider);
+    expect(provider.contexts).toBeGreaterThan(calls);
   } finally {
     if (paperId) await client.mutation(api.workspace.deletePaper, { paperId });
   }

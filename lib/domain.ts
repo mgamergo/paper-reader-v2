@@ -210,6 +210,7 @@ export const assistRequestSchema = z.object({
       text: z.string().max(8000),
       context: z.string().max(16000),
       page: z.number(),
+      rects: z.array(rectSchema).max(200).optional(),
     })
     .optional(),
   language: z.string().max(50).default("English"),

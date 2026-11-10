@@ -128,6 +128,32 @@ export class MockProvider implements RagProvider {
     request,
     evidence,
   }: Parameters<RagProvider["answer"]>[0]): Promise<DraftAnswer> {
+    if (request.action === "related") {
+      const cited = evidence
+        .filter(
+          (chunk) => chunk.kind === "references" && chunk.text.length >= 8,
+        )
+        .flatMap((chunk) =>
+          splitSentences(chunk.text).map((text) => ({
+            text,
+            evidence: [
+              {
+                chunkId: chunk.id,
+                quote: text.length >= 8 ? text : chunk.text,
+              },
+            ],
+          })),
+        );
+      const unique = [
+        ...new Map(cited.map((claim) => [claim.text, claim])).values(),
+      ].slice(0, 8);
+      return {
+        sentences: unique,
+        terms: [],
+        translation: "",
+        refused: unique.length === 0,
+      };
+    }
     const query = request.selection
       ? `${request.query} ${request.selection.text}`
       : request.query;
@@ -173,7 +199,11 @@ export class MockProvider implements RagProvider {
       refused: !selected.length,
     };
   }
-  async verify({ answer, evidence }: Parameters<RagProvider["verify"]>[0]) {
+  async verify({
+    answer,
+    evidence,
+    request,
+  }: Parameters<RagProvider["verify"]>[0]) {
     return {
       supported: answer.sentences.map((s) =>
         s.evidence.some((c) => {
@@ -181,7 +211,10 @@ export class MockProvider implements RagProvider {
           return (
             chunk !== undefined &&
             normalize(chunk.text).includes(normalize(c.quote)) &&
-            normalize(c.quote) === normalize(s.text)
+            (normalize(c.quote) === normalize(s.text) ||
+              (request.action === "related" &&
+                chunk.kind === "references" &&
+                normalize(c.quote).includes(normalize(s.text))))
           );
         }),
       ),

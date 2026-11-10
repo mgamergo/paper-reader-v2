@@ -48,7 +48,6 @@ async function fingerprints(papers: Paper[]): Promise<Record<string, string>> {
       title: paper.title,
       pages: paper.pages,
       outline: paper.outline,
-      references: paper.references,
     });
     const digest = await crypto.subtle.digest(
       "SHA-256",
@@ -288,7 +287,72 @@ export async function retrieve(input: AnswerInput): Promise<RetrievalResult> {
       "configuration",
       "Require 1 <= topK <= 20 and topK <= candidateK <= 40.",
     );
-  const filters = request.filters;
+  const normalizeSelection = (text: string) => text.replace(/\s+/g, " ").trim();
+  let sectionCandidate: Chunk | undefined;
+  if (request.action === "summarize" && request.selection && request.paperId) {
+    const selection = request.selection;
+    const pageCandidates = index.chunks.filter(
+      (chunk) =>
+        chunk.paperId === request.paperId && chunk.page === selection.page,
+    );
+    const selected = normalizeSelection(selection.text);
+    const matches = pageCandidates.filter((chunk) => {
+      const text = normalizeSelection(chunk.text);
+      return (
+        selected.length > 0 &&
+        (text.includes(selected) || selected.includes(text))
+      );
+    });
+    const candidates = matches.length ? matches : pageCandidates;
+    const anchors = (selection.rects ?? []).filter(
+      (rect) => rect.width > 0 && rect.height > 0,
+    );
+    const anchored = candidates
+      .map((chunk) => ({
+        chunk,
+        overlap: chunk.rects.reduce(
+          (sum, rect) =>
+            sum +
+            anchors.reduce(
+              (area, anchor) =>
+                area +
+                Math.max(
+                  0,
+                  Math.min(rect.x + rect.width, anchor.x + anchor.width) -
+                    Math.max(rect.x, anchor.x),
+                ) *
+                  Math.max(
+                    0,
+                    Math.min(rect.y + rect.height, anchor.y + anchor.height) -
+                      Math.max(rect.y, anchor.y),
+                  ),
+              0,
+            ),
+          0,
+        ),
+      }))
+      .filter((candidate) => candidate.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap)[0]?.chunk;
+    const context = normalizeSelection(selection.context);
+    sectionCandidate =
+      anchored ??
+      candidates.find(
+        (chunk) =>
+          context.length > 0 &&
+          (normalizeSelection(chunk.text).includes(context) ||
+            context.includes(normalizeSelection(chunk.text))),
+      ) ??
+      matches[0];
+  }
+  const selectedSection =
+    request.filters.section ?? sectionCandidate?.sectionPath.at(-1);
+  const filters = {
+    ...request.filters,
+    ...(request.action === "related" && !request.filters.kind
+      ? { kind: "references" as const }
+      : {}),
+    ...(selectedSection ? { section: selectedSection } : {}),
+  };
   const scoped = papers.filter(
     (p) =>
       (!request.paperId || p.id === request.paperId) &&
@@ -308,6 +372,12 @@ export async function retrieve(input: AnswerInput): Promise<RetrievalResult> {
   );
   const stages = [
     "scope+metadata-filters",
+    ...(request.action === "related" && !request.filters.kind
+      ? ["related-bibliography-scope"]
+      : []),
+    ...(selectedSection && !request.filters.section
+      ? ["selected-section-scope"]
+      : []),
     ...(filters.expandCitations ? ["ingested-citation-expansion"] : []),
     ...provider.limitations,
   ];

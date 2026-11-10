@@ -120,7 +120,6 @@ function fingerprint(paper: Paper): string {
         title: paper.title,
         pages: paper.pages,
         outline: paper.outline,
-        references: paper.references,
       }),
     )
     .digest("hex");
@@ -241,7 +240,7 @@ export async function askLibrary({
       vector: input.vector,
       paperIds: scoped.map((paper) => paper.id),
       version,
-      ...(request.filters.kind || request.filters.section
+      ...(input.allowedChunkIds.length < index.chunks.length
         ? { allowedChunkIds: input.allowedChunkIds }
         : {}),
     });

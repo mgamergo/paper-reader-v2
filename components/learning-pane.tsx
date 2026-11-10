@@ -181,6 +181,7 @@ export function LearningPane({
               text: currentSelection.text,
               context: currentSelection.context,
               page: currentSelection.page,
+              rects: currentSelection.rects.slice(0, 200),
             },
           }
         : {}),
