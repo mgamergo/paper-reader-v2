@@ -16,3 +16,14 @@ artifacts/e2e-test-results/
 artifacts/e2e-focused-results/
 artifacts/e2e-origin-failure/
 artifacts/e2e-extended-results/
+artifacts/*
+!artifacts/rag-*.json
+!artifacts/secret-scan.json
+!artifacts/release-*.json
+!artifacts/e2e-results.json
+!artifacts/acceptance-desktop.png
+!artifacts/acceptance-tablet.png
+!artifacts/acceptance-mobile.png
+!artifacts/acceptance-mobile-modal.png
+!artifacts/acceptance-native-ui-protocol.png
+!artifacts/acceptance-real-paper-*.png

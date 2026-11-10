@@ -2,7 +2,7 @@
 
 A research reader for people reading papers in a second language. Contextual explanations use the surrounding passage and paper evidence. English stays visible beside native-language explanations. Terms become a personal glossary and flashcards.
 
-Development is in progress. `FEATURES.md` is the release checklist; unchecked features are not verified.
+The complete local reader and advanced retrieval pipeline are implemented. `FEATURES.md` records pass/fail by feature and shortcut. Production authentication and generated multilingual quality require your keys and a separate live-provider acceptance run.
 
 ## Run locally
 
@@ -39,7 +39,7 @@ Required for real generation: an OpenAI-compatible/OpenRouter API key and model.
 
 ## Verification evidence
 
-Initial ingestion checks cover real PDF text and coordinates, numeric/author-year references, public URL boundaries, authentication fallback, storage bytes, duplicate imports, reading state, annotations, glossary, collection cleanup, and chat history. Full product and retrieval evaluation evidence will be recorded here after integration.
+Initial ingestion checks cover real PDF text and coordinates, numeric/author-year references, public URL boundaries, authentication fallback, storage bytes, duplicate imports, reading state, annotations, glossary, collection cleanup, and chat history. See [release verification](docs/release-verification.md) for the tested SHA, box ID, full checks, browser diagnostics, screenshots and independent review ledger.
 
 See `docs/architecture.md`, `FEATURES.md`, and `logbook.md` for current scope and decisions.
 
@@ -50,14 +50,14 @@ See `docs/architecture.md`, `FEATURES.md`, and `logbook.md` for current scope an
 | Ablation                     | Recall@5 | MRR@5 | nDCG@5 | Extractive faithfulness | Expected-answer match | Negative refusal |
 | ---------------------------- | -------: | ----: | -----: | ----------------------: | --------------------: | ---------------: |
 | BM25-only                    |    91.7% | 0.808 |  0.835 |                  100.0% |                 91.7% |           100.0% |
-| Dense-only (hash mock)       |    75.0% | 0.611 |  0.647 |                  100.0% |                 75.0% |           100.0% |
-| Hybrid                       |    91.7% | 0.736 |  0.783 |                  100.0% |                 91.7% |           100.0% |
-| Hybrid + contextual          |   100.0% | 0.861 |  0.897 |                  100.0% |                100.0% |           100.0% |
+| Dense-only (hash mock)       |    66.7% | 0.542 |  0.574 |                  100.0% |                 66.7% |           100.0% |
+| Hybrid                       |    83.3% | 0.642 |  0.690 |                  100.0% |                 83.3% |           100.0% |
+| Hybrid + contextual          |   100.0% | 0.806 |  0.855 |                  100.0% |                100.0% |           100.0% |
 | Hybrid + contextual + rerank |   100.0% | 0.958 |  0.969 |                  100.0% |                100.0% |           100.0% |
 
 <!-- rag-eval:end -->
 
-This deterministic offline regression uses two real CC BY 4.0 arXiv papers, OLMo and The Pile, with 98 chunks from their first six pages. Eight development questions select BM25 k1/b; twelve different positive questions and four negatives form the regression set. The selected defaults are k1=1.2, b=0.75 because the development grid tied. TF-IDF cosine and RRF are separate stages. Query rewrite, multi-query, HyDE, and parent expansion are disabled equally in this ablation to isolate the listed components; their mechanics have separate tests.
+This deterministic offline regression uses two real CC BY 4.0 arXiv papers, OLMo and The Pile, with 93 chunks from their first six pages. Eight development questions select BM25 k1/b; twelve different positive questions and four negatives form the regression set. The selected defaults are k1=1.2, b=0.75 because the development grid tied. TF-IDF cosine and RRF are separate stages. Query rewrite, multi-query, HyDE, and parent expansion are disabled equally in this ablation to isolate the listed components; the same fixed judgments also gate a separate production-stage run with all four enabled.
 
 The full configuration must pass every fixed expected-passage and expected-answer judgment, refuse all negatives, and preserve exact source support. The eval saves failure evidence and exits nonzero if that release gate fails. Sentence-boundary regressions cover spaced decimals, author abbreviations, line hyphenation, and naming clauses that also explain behavior. Judgments were not changed to accommodate failures.
 
@@ -88,3 +88,13 @@ bun scripts/cache-import-fixtures.ts
 ```
 
 This downloads and checksum-checks real public metadata and PDF bytes once into ignored `.data/import-fixtures`. The real-PDF layout regression uses this cache. Unit tests, the checked-in CC BY retrieval corpus, and the configured mock never require a paid key. For offline browser imports, start the local app with `IMPORT_FIXTURE_CACHE_DIR` pointing at that prepared cache. A missing source fails explicitly; it never becomes a synthetic paper.
+
+## Operations and demos
+
+See [local verification and private backup](docs/operations.md) and the [feature demo guide](docs/demo-guide.md). GitHub verification is manual-only; no CI job, deployment, publication or social post was triggered in this session. The GitHub repository remains private on branch `dev`.
+
+## Known limits
+
+The offline provider extracts English source text and literal definitions. It does not translate or simplify prose, and its hash vectors are not semantic embeddings. Configure a real compatible provider for those features. Hindi, Telugu and Marathi preference/action wiring, paired native citations and source-linked vocabulary are tested as protocols; generated quality is unmeasured. Real Clerk authentication requires external keys and has not been exercised; local ownership rules have real-backend tests with two identities.
+
+PDF layouts, bibliography variants and formula extraction use bounded heuristics. Figure/equation assistance uses actual text, captions and section evidence; it does not claim image or mathematical understanding. Scans without text are rejected; OCR, large-library worker queues, collaborative editing, TTS and reference-manager sync remain P2. Chromium desktop/tablet/mobile viewports were checked; Firefox, Safari and physical devices were not. The backup includes stored PDFs and passes ZIP integrity; restore is untested.

@@ -1,0 +1,86 @@
+{
+  "phase": "source",
+  "success": true,
+  "sha": "d7d04bbca25d7ac4255abe41aa2e1628f0faf89d",
+  "sourceHash": "093d3afc5b3f38b47c3ca9d2bccc3304542685cdb8aa0916eb94fb141ce69f7a",
+  "buildId": "GVRyb04lMmUZ1z0FkQe2_",
+  "boxInstanceId": "0e09ad54-c2a4-4c19-8e9b-2d80fca789a4",
+  "startedAt": "2026-11-10T15:19:00.786Z",
+  "finishedAt": "2026-11-10T15:19:38.648Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "convexUrl": "http://127.0.0.1:3210",
+  "results": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationMs": 2233,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/1-format:check.log",
+      "timedOut": false
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationMs": 4509,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/2-lint.log",
+      "timedOut": false
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "durationMs": 1755,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/3-typecheck.log",
+      "timedOut": false
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationMs": 18737,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/4-test.log",
+      "timedOut": false
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "eval:rag"
+      ],
+      "exitCode": 0,
+      "durationMs": 5470,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/5-eval:rag.log",
+      "timedOut": false
+    },
+    {
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationMs": 5126,
+      "log": ".data/verification/2026-11-10T15-19-00.786Z-e82bb617-source/6-build.log",
+      "timedOut": false
+    }
+  ],
+  "unitIntegration": {
+    "passed": 109,
+    "failed": 0,
+    "assertions": 495,
+    "files": 23
+  }
+}
