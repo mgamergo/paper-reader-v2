@@ -71,6 +71,8 @@ export default function Workspace({
   const [loadError, setLoadError] = useState("");
   const [retry, setRetry] = useState(0);
   const [currentId, setCurrentId] = useState<string | null>(null);
+  const [learningTab, setLearningTab] = useState<LearningTab>("learn");
+  const [chatScope, setChatScope] = useState("document");
   const [secondaryId, setSecondaryId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [allAnnotations, setAllAnnotations] = useState<
@@ -772,6 +774,16 @@ export default function Workspace({
                   ref={learning}
                   paper={activePaper}
                   collections={library.collections}
+                  tab={learningTab}
+                  onTabChange={setLearningTab}
+                  scope={
+                    library.collections.some(
+                      (collection) => collection.id === chatScope,
+                    )
+                      ? chatScope
+                      : "document"
+                  }
+                  onScopeChange={setChatScope}
                   settings={settings}
                   glossary={library.glossary}
                   annotations={annotations}

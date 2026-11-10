@@ -77,6 +77,10 @@ export function LearningPane({
   onAnnotations,
   onError,
   renderReferences,
+  tab,
+  onTabChange: setTab,
+  scope,
+  onScopeChange: setScope,
   ref,
 }: {
   paper: Paper;
@@ -91,11 +95,13 @@ export function LearningPane({
   onAnnotations: () => Promise<void>;
   onError: (error: string) => void;
   renderReferences: React.ReactNode;
+  tab: LearningTab;
+  onTabChange: (tab: LearningTab) => void;
+  scope: string;
+  onScopeChange: (scope: string) => void;
   ref?: Ref<LearningHandle>;
 }) {
-  const [tab, setTab] = useState<LearningTab>("learn");
   const [history, setHistory] = useState<ChatMessage[]>([]);
-  const [scope, setScope] = useState("document");
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -160,9 +166,9 @@ export function LearningPane({
           ? "Find related papers cited by this paper. Only name works supported by the bibliography."
           : `Explain the ${action === "figure" ? "figure using its actual caption and section evidence; state visual limitations" : action === "equation" ? "equation using its actual section evidence" : "selected passage in this paper"}.`;
     const body: AssistRequest = replay ?? {
-      ...(scope === "document"
-        ? { paperId: paper.id }
-        : { collectionId: scope }),
+      ...(action === "chat" && scope !== "document"
+        ? { collectionId: scope }
+        : { paperId: paper.id }),
       query: (query || currentSelection?.text || input || fallback).slice(
         0,
         4000,
@@ -504,13 +510,11 @@ export function LearningPane({
                     onChange={(e) => setScope(e.target.value)}
                   >
                     <option value="document">This paper</option>
-                    {collections
-                      .filter((c) => paper.collectionIds.includes(c.id))
-                      .map((c) => (
-                        <option key={c.id} value={c.id}>
-                          Collection: {c.name}
-                        </option>
-                      ))}
+                    {collections.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        Collection: {c.name}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 {historyLoading && <Loading text="Loading conversation…" />}

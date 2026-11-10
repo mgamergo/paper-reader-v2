@@ -1,3 +1,5 @@
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import { importBytes } from "./extended-support";
 import {
   test,
   expect,
@@ -5,6 +7,7 @@ import {
   openPaper,
   upload,
   assist,
+  selectText,
 } from "./acceptance-support";
 import { paperSchema, collectionSchema } from "../../lib/domain";
 
@@ -263,6 +266,145 @@ test("citation card imports the cited real paper and restores the task-owned sou
             },
           })
         ).ok(),
+      ).toBe(true);
+  }
+});
+
+test("cross-paper source jumps preserve collection conversation and keep Explain scoped to the reader", async ({
+  page,
+  request,
+  owned,
+}) => {
+  const title = `Cross-paper calibration ${Date.now()}`;
+  let secondId = "",
+    collectionId = "";
+  try {
+    const pdf = await PDFDocument.create();
+    pdf.setTitle(title);
+    pdf.setAuthor("Reader verification team");
+    const font = await pdf.embedFont(StandardFonts.TimesRoman);
+    const sheet = pdf.addPage([612, 792]);
+    for (const [index, text] of [
+      title,
+      "Original verification fixture. Not a published study.",
+      "Quartz calibration uses a green laser to measure lattice vibration.",
+    ].entries())
+      sheet.drawText(text, {
+        x: 40,
+        y: 730 - index * 36,
+        size: index === 0 ? 16 : 11,
+        font,
+      });
+    const second = await importBytes(
+      page,
+      title,
+      Buffer.from(await pdf.save()),
+    );
+    secondId = second.id;
+    const created = await request.post("/api/collections", {
+      data: { name: `Cross-paper collection ${Date.now()}`, color: "#3158a0" },
+    });
+    expect(created.ok()).toBe(true);
+    collectionId = collectionSchema.parse(await created.json()).id;
+    for (const id of [owned.paper.id, secondId])
+      expect(
+        (
+          await request.patch(`/api/papers/${id}`, {
+            data: { collectionIds: [collectionId] },
+          })
+        ).ok(),
+      ).toBe(true);
+    await openPaper(page, owned.title);
+    await page.getByRole("tab", { name: "Chat", exact: true }).click();
+    const history = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/api/chat" &&
+        new URL(response.url()).searchParams.get("paperId") ===
+          `collection:${collectionId}`,
+    );
+    await page.getByLabel("Chat scope").selectOption(collectionId);
+    await history;
+    await expect(
+      page.getByText("Loading conversation…", { exact: true }),
+    ).toBeHidden();
+    const question =
+      "What does the green laser measure during quartz calibration?";
+    await page.getByLabel("Ask a follow-up question").fill(question);
+    const result = await assist(
+      page,
+      () => page.getByLabel("Ask a follow-up question").press("Enter"),
+      "cross-paper-collection",
+    );
+    expect(result.answer.refused).toBe(false);
+    const source = result.answer.sentences
+      .flatMap((sentence) => sentence.citations)
+      .find(
+        (citation) =>
+          citation.paperId === secondId &&
+          citation.quote.includes("Quartz calibration"),
+      );
+    if (!source)
+      throw new Error(
+        "Cross-paper answer did not cite the distinct calibration source",
+      );
+    const progressSaved = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === `/api/papers/${secondId}` &&
+        response.request().method() === "PATCH",
+    );
+    await page
+      .getByRole("button", {
+        name: `Read source on page ${source.page}: ${source.quote.slice(0, 90)}`,
+        exact: true,
+      })
+      .first()
+      .click();
+    await expect(page.locator(".workspace-header h1")).toHaveText(title);
+    await expect(page.locator(".textLayer")).toContainText([
+      "Quartz calibration uses a green laser",
+    ]);
+    await expect(page.locator(".citation-flash").first()).toBeVisible();
+    await expect(
+      page.getByRole("tab", { name: "Chat", exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByLabel("Chat scope")).toHaveValue(collectionId);
+    await expect(page.locator(".chat-message.user")).toContainText([question]);
+    await selectText(page, "Quartz calibration uses a green laser");
+    const explanation = await assist(
+      page,
+      () =>
+        page
+          .getByLabel("Selected text actions")
+          .getByRole("button", { name: "Explain", exact: true })
+          .click(),
+      "cross-paper-explain",
+    );
+    expect(explanation.request.paperId).toBe(secondId);
+    expect(explanation.request.collectionId).toBeUndefined();
+    expect(explanation.answer.refused).toBe(false);
+    expect(
+      explanation.answer.sentences
+        .flatMap((sentence) => sentence.citations)
+        .every((citation) => citation.paperId === secondId),
+    ).toBe(true);
+    await page.getByRole("tab", { name: "Chat", exact: true }).click();
+    await expect(page.getByLabel("Chat scope")).toHaveValue(collectionId);
+    await expect(page.locator(".chat-message.user")).toHaveCount(1);
+    await expect(page.locator(".chat-message.user")).toContainText([question]);
+    const progressResponse = await progressSaved;
+    expect(progressResponse.ok()).toBe(true);
+    expect(paperSchema.parse(await progressResponse.json()).currentPage).toBe(
+      source.page,
+    );
+    await page.waitForLoadState("networkidle");
+  } finally {
+    await page.goto("about:blank");
+    await page.waitForLoadState("networkidle");
+    if (secondId)
+      expect((await request.delete(`/api/papers/${secondId}`)).ok()).toBe(true);
+    if (collectionId)
+      expect(
+        (await request.delete(`/api/collections/${collectionId}`)).ok(),
       ).toBe(true);
   }
 });
