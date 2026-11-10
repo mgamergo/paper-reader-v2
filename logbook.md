@@ -1,5 +1,13 @@
 # Logbook
 
+## 2026-11-10 • Both independent reviews approved
+
+Functionality/RAG/security approved after3rounds; UI/UX approved after2rounds with allU1–U4 resolved and no new findings. Independent UI round2 passed global formatting/lint/types,2focused unit tests/8assertions and5focused browser cases, and confirmed unchanged source/build identity. Parent full gates are120tests/563assertions and37browser cases, unchanged RAG judgments/ablations and production build. Four UI feature commits were pushed and remote-equality checked individually: d464ae3,90fff05,c92ca83,d002d5d. All73P0+12P1 checklist rows now pass within explicit local/mock scope;8P2deferred. Final clean-SHA verification, fresh private backup and final report follow.
+
+## 2026-11-10 • UI/UX review fixes
+
+Independent UI review passed the old119source tests and35browser tests but found four real defects: typed annotation tag separators vanished; search/source links scrolled only to page tops; annotation/glossary deletion lacked confirmation; mobile navigation did not own focus. Fixed all four with raw tag drafts, rendered-rectangle scrolling, a shared cancelable permanent-delete dialog, and a Radix modal drawer. Added high-zoom search/note/chat visibility, typed tag persistence, physical cancellation persistence and drawer focus/import-handoff regressions. Initial focused3/5run exposed two additional defects; fixed the focus handoff and an exact-source mock comparison-verb refusal without changing the question or weakening assertions. Source120tests/563assertions and all unchanged RAG judgments pass; focused5/5browser run passes. Full37case run and Sol round2 are next. Source changes remain uncommitted/unpushed during the review loop.
+
 ## 2026-11-10 • Functionality approval and UI stack
 
 Functionality/security/RAG sol-loop approved after three rounds. Both reviewer findings and five parent audit items are resolved; no findings declined. Full119tests/559assertions, unchanged real-paper evaluation, production build, and35browser cases passed before the UI stack change. Each of five source feature commits was pushed and remote equality verified, ending at700259f. Added the requested shadcn/ui owned Button/CVA/Slot/cn pattern and components.json, preserving reader CSS and upstream MIT notice. Its complete source gate and35/35browser cases passed on build ozyHqafgvciYio2xE1RZZ, source fingerprint ff84880b4f0c567857d7fbd5a8f8d52e3de1c36dced03cdaf53365dd103f3ead. Separate UI/UX review follows.

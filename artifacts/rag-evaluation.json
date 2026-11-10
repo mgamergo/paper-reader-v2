@@ -1,8 +1,8 @@
 {
   "runtime": "1.4.4",
-  "generatedAt": "2026-11-10T16:29:14.177Z",
-  "revision": "700259f28381da670072f4bd1c9bd47e089bb9e2",
-  "workingTreeStatus": "M .gitignore\n M NOTICE\n M README.md\n M artifacts/acceptance-desktop.png\n M artifacts/acceptance-mobile-modal.png\n M artifacts/acceptance-mobile.png\n M artifacts/acceptance-native-ui-protocol.png\n M artifacts/acceptance-real-paper-mobile.png\n M artifacts/acceptance-tablet.png\n M artifacts/e2e-results.json\n M artifacts/rag-evaluation.json\n M components/ui/primitives.tsx\n M docs/rag-evaluation.md\n A docs/sol-loop.md\n M logbook.md\n?? artifacts/acceptance-auth-unavailable-desktop.png\n?? artifacts/acceptance-auth-unavailable-mobile.png\n?? components.json\n?? components/ui/button.tsx\n?? lib/utils.ts\n?? licenses/",
+  "generatedAt": "2026-11-10T16:54:13.096Z",
+  "revision": "6754de5719a7bc89a9ffd01814e74914acd56bba",
+  "workingTreeStatus": "M app/globals.css\n M artifacts/acceptance-desktop.png\n M artifacts/acceptance-mobile-modal.png\n M artifacts/acceptance-mobile.png\n M artifacts/acceptance-native-ui-protocol.png\n M artifacts/acceptance-real-paper-desktop.png\n M artifacts/acceptance-real-paper-mobile.png\n M artifacts/acceptance-tablet.png\n M artifacts/e2e-results.json\n M artifacts/rag-evaluation.json\n M components/learning-pane.tsx\n M components/pdf-reader.tsx\n M components/workspace.tsx\n M docs/operations.md\n M docs/rag-evaluation.md\n M docs/sol-loop.md\n M lib/rag/mock.ts\n M tests/e2e/acceptance.spec.ts\n M tests/unit/rag-source-definitions.test.ts\n?? tests/e2e/ui-review.spec.ts",
   "fileHashes": {
     "lib/domain.ts": "bcac107b10d76257ef4b4339e556acd4bb8eb171b14dc733cf4bc21570b3a761",
     "lib/rag/chunks.ts": "333602667e6f434b7e2c8c793417b9331a229b0373fa962047e249a250be21c5",
@@ -10,7 +10,7 @@
     "lib/rag/contracts.ts": "e254e6d8ad6fbc5a918dcc209fdeff7cfdb11a814927d629fb320ba91753c4cd",
     "lib/rag/evaluation.ts": "ceb029ee54a5c010901788ee726deb108ac98fec7e2e576399b6d4edc82b6951",
     "lib/rag/index.ts": "403a3bd75f9b544ff31e85f99846822d1685c388d02253fa0136e09e49416c56",
-    "lib/rag/mock.ts": "bb572164923e49d940a8585ccafdde2afa028083945bfea9f3416d371e430396",
+    "lib/rag/mock.ts": "4edab8dd027fe04592c35f1b31285f7323c37999ec2c293880dce37d2ad0d13f",
     "lib/rag/provider.ts": "95fd61992ce4a3c51a91bee56594779c4351e07ad2e09288db244a36beec282e",
     "lib/rag/ranking.ts": "88228c0d53b6cefed904bf595241771210609a2e2dd52ac9aa3e642553dc73de",
     "lib/rag/text.ts": "a7f2f51b58242012b8743a02e129209d0393cc3e1b7a0624f69d43214be75abc",
@@ -32,7 +32,7 @@
     "tests/unit/rag-provider.test.ts": "ef4488fd2c1558acc55c6b9dd904b9de1c5b62b1e13a623306e4b9c2f7568d63",
     "tests/unit/rag-ranking.test.ts": "bc44629b4daa03daa9308421f33cadb1ab97a3d326746c1bbdb8153df93acdf4",
     "tests/unit/rag-sentence-boundaries.test.ts": "d4562317e01ac120ee1759c80b55548400cc09efdf84606d20802d4a41abd866",
-    "tests/unit/rag-source-definitions.test.ts": "009af176c6aea7561c326d3756bbc3797e6899cc33ba5c7ecd12e360cd69313c"
+    "tests/unit/rag-source-definitions.test.ts": "9c68da5f8cfdb6b5d1326c36d74beeac5f087355a1c12e040af13f47359a9dab"
   },
   "provider": "offline-extractive-mock",
   "embedding": {

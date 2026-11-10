@@ -29,3 +29,6 @@ artifacts/*
 !artifacts/acceptance-real-paper-*.png
 
 !artifacts/acceptance-auth-unavailable-*.png
+
+!artifacts/acceptance-library-*.png
+!artifacts/acceptance-delete-confirmation-desktop.png

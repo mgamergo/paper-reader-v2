@@ -100,7 +100,7 @@ Status: `[ ]` pending, failed, or deferred; `[x]` implemented and verified withi
 | [x]    | P0       | Loopback local mode works with no paid keys; production fails closed without auth configuration                                 | Safe no-key development          |
 | [x]    | P0       | Keyboard/screen-reader basics, focus indication, modal focus management, reduced motion                                         | Inclusive reading                |
 | [x]    | P0       | Unit/integration/E2E tests, diagnostics attached before navigation, desktop/tablet/mobile inspected screenshots                 | Prove real user flows            |
-| [ ]    | P0       | Two sol-loop passes: functionality/RAG/security, then UI/UX; findings ledger and retests                                        | Independent verification         |
+| [x]    | P0       | Two sol-loop passes: functionality/RAG/security, then UI/UX; findings ledger and retests                                        | Independent verification         |
 | [x]    | P1       | Reproducible setup/start/test commands, CI, data backup/export and missing-key documentation                                    | Maintainable open-source project |
 | [ ]    | P2       | Offline PWA, multi-device background sync, localization of all chrome, large-library worker queues                              | Additional operational scale     |
 
@@ -157,10 +157,10 @@ The rows record observed product capabilities and our resulting design decisions
 ## Acceptance evidence
 
 - Core algorithms, provider protocols, ownership and real Convex storage: `tests/unit` and `tests/integration`; source release gate in `docs/release-verification.md`.
-- Actual imports, PDF text/copy/search, annotations/exports, citations/previews, language requests, glossary/review, chat/source flashes, debugging, split view, shortcuts and responsive dialogs: `tests/e2e/acceptance.spec.ts`, `edge-flows.spec.ts`, `source-and-scope.spec.ts`, `extended.spec.ts`.
+- Actual imports, PDF text/copy/search, annotations/exports, citations/previews, language requests, glossary/review, chat/source flashes, debugging, split view, shortcuts and responsive dialogs: `tests/e2e/acceptance.spec.ts`, `edge-flows.spec.ts`, `source-and-scope.spec.ts`, `extended.spec.ts`, `ui-review.spec.ts`, `auth-boundary.spec.ts`.
 - Exact glyph/highlight intersection is checked after zoom and rotation. Citation groups/ranges, author-year, geometric superscripts, unresolved state and equation numbers in separate PDF spans have regression coverage.
 - Real-paper retrieval: five controlled ablations plus a separate complete production-stage run, fixed expected passages/answers, negative refusals, per-claim source checks, scores and source hashes in `artifacts/rag-evaluation.json`.
 - Operations: `docs/operations.md`, repeatable source/browser verification, manual-only CI, private ZIP-integrity-checked export including PDF storage, and `docs/demo-guide.md`. CI execution and restore were not performed.
 - Every keyboard registry entry has a unique validated binding. Overrides persist, reject conflicts and preserve text entry. Escape itself can be remapped; physical Escape remains a permanent accessible dismissal fallback.
 
-Unchecked P2 rows are known exclusions, not hidden release failures. Reference and layout detection are heuristic; unsupported scans fail explicitly. Visual equation/figure understanding and live-model language quality are not established by text/caption retrieval or protocol tests.
+All73P0 and12P1 rows pass within the stated local/mock scope, including both independent review passes. Eight P2 rows are deferred. Unchecked P2 rows are known exclusions, not hidden release failures. Reference and layout detection are heuristic; unsupported scans fail explicitly. Visual equation/figure understanding and live-model language quality are not established by text/caption retrieval or protocol tests.
