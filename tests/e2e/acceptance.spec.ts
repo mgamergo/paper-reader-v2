@@ -485,6 +485,44 @@ test("glossary save edit delete and persisted flashcard grade", async ({
   expect(graded?.interval).toBe(2);
   expect(graded?.dueAt).toBeGreaterThan(Date.now() + 86400000);
   await openPaper(page, owned.title);
+  await selectText(page);
+  const repeated = await assist(
+    page,
+    () =>
+      page
+        .getByLabel("Selected text actions")
+        .getByRole("button", { name: "Explain", exact: true })
+        .click(),
+    "glossary-resave",
+  );
+  expect(
+    repeated.answer.terms.some((candidate) => candidate.term === term.term),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: `Save ${term.term} to glossary`, exact: true })
+    .click();
+  await expect(
+    page.getByText(`Saved “${term.term}” to your glossary.`, { exact: true }),
+  ).toBeVisible();
+  const afterSave = (await library(request)).glossary.filter(
+    (word) =>
+      word.paperId === owned.paper.id &&
+      word.term.toLowerCase() === term.term.toLowerCase(),
+  );
+  expect(afterSave).toHaveLength(1);
+  expect([
+    afterSave[0]?.interval,
+    afterSave[0]?.repetitions,
+    afterSave[0]?.dueAt,
+    afterSave[0]?.createdAt,
+  ]).toEqual([
+    graded?.interval,
+    graded?.repetitions,
+    graded?.dueAt,
+    graded?.createdAt,
+  ]);
+
+  await openPaper(page, owned.title);
   await page.getByRole("tab", { name: "Review", exact: true }).click();
   await expect(
     page.getByText("You’re up to date", { exact: true }),

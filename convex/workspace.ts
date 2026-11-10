@@ -471,7 +471,15 @@ export const putGlossary = mutation({
           w.term.toLocaleLowerCase() === word.term.toLocaleLowerCase()),
     );
     if (existing) {
-      const merged = { ...word, id: existing.id };
+      const stored = glossarySchema.parse(JSON.parse(existing.json));
+      const merged = {
+        ...word,
+        id: existing.id,
+        dueAt: stored.dueAt,
+        interval: stored.interval,
+        repetitions: stored.repetitions,
+        createdAt: stored.createdAt,
+      };
       await ctx.db.patch(existing._id, {
         json: JSON.stringify(merged),
         term: merged.term,

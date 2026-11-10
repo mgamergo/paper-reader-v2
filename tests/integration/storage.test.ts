@@ -124,6 +124,33 @@ test("Convex stores PDF bytes and owner-scoped reading, annotations, glossary, c
         dueAt: Date.now() + 86400000,
       }),
     });
+    const reviewed = librarySchema
+      .parse(await client.query(api.workspace.library, {}))
+      .glossary.find((entry) => entry.id === word.id);
+    if (!reviewed) throw new Error("Reviewed glossary entry missing");
+    const savedAgain = await client.mutation(api.workspace.putGlossary, {
+      json: JSON.stringify({
+        ...word,
+        id: randomUUID(),
+        term: "ATTENTION",
+        definition: "Updated source-supported definition",
+        createdAt: Date.now() + 9999,
+        dueAt: 0,
+      }),
+    });
+    expect(savedAgain.id).toBe(word.id);
+    expect(savedAgain.definition).toBe("Updated source-supported definition");
+    expect([
+      savedAgain.interval,
+      savedAgain.repetitions,
+      savedAgain.dueAt,
+      savedAgain.createdAt,
+    ]).toEqual([
+      reviewed.interval,
+      reviewed.repetitions,
+      reviewed.dueAt,
+      reviewed.createdAt,
+    ]);
     const message: ChatMessage = {
       id: randomUUID(),
       paperId,
