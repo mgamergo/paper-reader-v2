@@ -73,7 +73,13 @@ export type ReaderHandle = {
   jump: (citation: PassageCitation) => void;
 };
 type ViewTarget = { page: number; rects: Rect[]; nonce: number };
-type Match = { page: number; start: number; length: number; ordinal: number };
+type Match = {
+  page: number;
+  start: number;
+  length: number;
+  ordinal: number;
+  nonce?: number;
+};
 export function viewportRect(
   rect: Rect,
   viewport: PageViewport,
@@ -93,6 +99,19 @@ export function viewportRect(
 }
 function rectStyle(rect: Rect): CSSProperties {
   return { left: rect.x, top: rect.y, width: rect.width, height: rect.height };
+}
+function revealPassage(element: HTMLElement, rect: Rect) {
+  const area = element.closest(".pdf-scroll");
+  if (!(area instanceof HTMLElement)) return;
+  const page = element.getBoundingClientRect();
+  const bounds = area.getBoundingClientRect();
+  area.scrollBy({
+    top:
+      page.top + rect.y + rect.height / 2 - bounds.top - area.clientHeight / 2,
+    left:
+      page.left + rect.x + rect.width / 2 - bounds.left - area.clientWidth / 2,
+    behavior: "instant",
+  });
 }
 function selectionRects(
   range: Range,
@@ -161,6 +180,7 @@ export function PdfReader({
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [matchIndex, setMatchIndex] = useState(0);
+  const [matchNavigation, setMatchNavigation] = useState(0);
   const [target, setTarget] = useState<ViewTarget | null>(null);
   const [size, setSize] = useState({ width: 700, height: 800 });
   const area = useRef<HTMLDivElement>(null);
@@ -246,6 +266,7 @@ export function PdfReader({
     if (!matches.length) return;
     const index = (matchIndex + direction + matches.length) % matches.length;
     setMatchIndex(index);
+    setMatchNavigation((value) => value + 1);
     const item = matches[index];
     if (item) jumpPage(item.page);
   }
@@ -367,7 +388,10 @@ export function PdfReader({
       }
     },
   }));
-  const selectedMatch = matches[matchIndex];
+  const selectedMatch = useMemo(() => {
+    const match = matches[matchIndex];
+    return match ? { ...match, nonce: matchNavigation } : undefined;
+  }, [matches, matchIndex, matchNavigation]);
   // Inferred headings come from the ingestion spans, without inventing an outline.
   const outline = paper.outline.length
     ? paper.outline
@@ -518,6 +542,7 @@ export function PdfReader({
             onChange={(e) => {
               setQuery(e.target.value);
               setMatchIndex(0);
+              setMatchNavigation((value) => value + 1);
               const match = paper.pages.find((p) =>
                 p.text.toLowerCase().includes(e.target.value.toLowerCase()),
               );
@@ -857,6 +882,7 @@ function PdfPage({
   const canvas = useRef<HTMLCanvasElement>(null);
   const text = useRef<HTMLDivElement>(null);
   const layer = useRef<TextLayer | null>(null);
+  const revealedSearch = useRef("");
   const viewport = useRef<PageViewport | null>(null);
   const [view, setView] = useState<PageViewport | null>(null);
   const [renderVersion, setRenderVersion] = useState(0);
@@ -1013,7 +1039,16 @@ function PdfPage({
       found = sourceText.indexOf(needle, found + needle.length);
       localIndex++;
     }
-    requestAnimationFrame(() => setSearchRects(rects));
+    const frame = requestAnimationFrame(() => {
+      setSearchRects(rects);
+      const current = rects.find((match) => match.active);
+      const key = `${query}:${activeMatch?.ordinal}:${activeMatch?.nonce}:${scale}:${rotation}`;
+      if (current && element.current && key !== revealedSearch.current) {
+        revealedSearch.current = key;
+        revealPassage(element.current, current.rect);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
   }, [
     ready,
     renderVersion,
@@ -1025,6 +1060,15 @@ function PdfPage({
     paper.pages,
     near,
   ]);
+  useEffect(() => {
+    const first = target?.rects[0];
+    if (!ready || !view || view.scale !== scale || !first) return;
+    const frame = requestAnimationFrame(() => {
+      if (element.current)
+        revealPassage(element.current, viewportRect(first, view, base.height));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [ready, view, scale, target, base.height]);
   function capture() {
     const selection = window.getSelection();
     const el = element.current;

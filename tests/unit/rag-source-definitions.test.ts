@@ -34,3 +34,32 @@ test("offline glossary definitions are exact source text with independent eviden
     (await provider.verify({ request, evidence, answer })).termsSupported,
   ).toBe(false);
 });
+
+test("offline procedural answers retain original comparison evidence", async () => {
+  const provider = new MockProvider();
+  const text =
+    "A query compares against keys to determine the weights applied to values.";
+  const evidence = [
+    {
+      id: "comparison",
+      paperId: "p",
+      page: 1,
+      text,
+      parentText: "",
+      sectionPath: ["Methods"],
+      kind: "text",
+    },
+  ] satisfies Parameters<MockProvider["answer"]>[0]["evidence"];
+  const request = assistRequestSchema.parse({
+    query: "How does a query determine the weights applied to values?",
+  });
+  const answer = await provider.answer({ request, evidence });
+  expect(answer.refused).toBe(false);
+  expect(answer.sentences.map((sentence) => sentence.text)).toEqual([text]);
+  expect(answer.sentences[0]?.evidence).toEqual([
+    { chunkId: "comparison", quote: text },
+  ]);
+  expect(
+    (await provider.verify({ request, evidence, answer })).supported,
+  ).toEqual([true]);
+});

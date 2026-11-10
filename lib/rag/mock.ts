@@ -32,7 +32,7 @@ function substantive(text: string): boolean {
     /[.!?]$/.test(text) &&
     (text.match(/[=√∑∫∂]/g)?.length ?? 0) < 2 &&
     (text.match(/[a-z]+/gi)?.length ?? 0) >= 7 &&
-    /\b(is|are|was|were|has|have|use[sd]?|include[sd]?|contain[sd]?|compute[sd]?|provide[sd]?|measure[sd]?|consists?|reduce[sd]?|replace[sd]?|apply|applies|train(?:ed)?|perform[sd]?|we|can|will)\b/i.test(
+    /\b(is|are|was|were|has|have|use[sd]?|include[sd]?|contain[sd]?|compute[sd]?|compare[sd]?|provide[sd]?|measure[sd]?|consists?|reduce[sd]?|replace[sd]?|apply|applies|train(?:ed)?|perform[sd]?|we|can|will)\b/i.test(
       text,
     ) &&
     (!/\bwe (?:call|name|refer to)\b/i.test(text) ||
