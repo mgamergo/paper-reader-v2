@@ -238,7 +238,11 @@ export default function Workspace() {
         const total =
           library?.papers.find((p) => p.id === id)?.pages.length ?? 1;
         void api
-          .paper(id, { currentPage: page, progress: page / Math.max(1, total) })
+          .paper(
+            id,
+            { currentPage: page, progress: page / Math.max(1, total) },
+            true,
+          )
           .then((next) => {
             setLibrary((previous) =>
               previous

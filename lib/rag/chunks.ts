@@ -247,6 +247,7 @@ export function chunkPapers(
               ? 0
               : (number?.[1]?.split(".").length ?? 1) - 1);
           section = [...section.slice(0, depth), line.text];
+          continue;
         }
         const kind = classify(line.text, section);
         if (

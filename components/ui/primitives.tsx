@@ -134,6 +134,15 @@ export function Popover({
           onOpenAutoFocus={(event) => {
             if (preview) event.preventDefault();
           }}
+          onCloseAutoFocus={(event) => {
+            const focused = document.activeElement;
+            if (
+              focused instanceof HTMLElement &&
+              focused !== document.body &&
+              !focused.closest(".popover")
+            )
+              event.preventDefault();
+          }}
           className="popover"
           sideOffset={8}
           collisionPadding={12}

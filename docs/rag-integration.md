@@ -18,7 +18,7 @@ deserializeIndex(value: unknown): RagIndex
 
 ## Persistence and authorization
 
-The index format is **version 3**, including baseline-aware line grouping, zero-based outline ancestry, and cross-page section continuation. Earlier worker snapshots used versions 1 and 2; rebuild those indexes. The parent adapter parses `indexSchema`, so a version-1/2 manifest fails parsing and is rebuilt through its existing catch path. No shared domain migration is needed.
+The index format is **version 4**, including baseline-aware line grouping, zero-based outline ancestry, and cross-page section continuation. Earlier worker snapshots used versions 1 and 2; rebuild those indexes. The parent adapter parses `indexSchema`, so a version-1/2 manifest fails parsing and is rebuilt through its existing catch path. No shared domain migration is needed.
 
 Persist the full manifest (version, embedding identity, context identity, contextual flag, paper fingerprints, parameters) with its chunks. Chunk rows retain the exact domain `Chunk` shape. Keep original child text, parent text, context prefix, contextual text, anchors, and embeddings; the context prefix is not citation evidence. Preserve parameters when combining indexes. Combine only indexes with equal format, embedding identity, context identity, contextual flag, and chunk parameters. The public retrieval boundary checks fingerprints and regenerates source chunks to catch stale/corrupted text or anchors.
 

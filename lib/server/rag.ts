@@ -131,7 +131,7 @@ function versionFor(provider: RagProvider): string {
       JSON.stringify([
         provider.identity,
         provider.contextIdentity,
-        "convex-vector-scope-v2",
+        "convex-vector-scope-v2-layout-body-v2",
       ]),
     )
     .digest("hex");

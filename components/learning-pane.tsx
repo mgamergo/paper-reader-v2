@@ -610,6 +610,7 @@ export function LearningPane({
               <label>
                 Passage type
                 <select
+                  aria-label="Passage type"
                   value={kind}
                   onChange={(e) => {
                     const value = e.target.value;

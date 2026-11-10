@@ -59,10 +59,17 @@ export function internalReferenceTarget(
   const numberedEquation = new RegExp(`\\(${escaped}\\)\\s*$`);
   return paper.pages
     .flatMap((p) =>
-      p.spans.map((span, i) => ({
+      p.spans.map((span) => ({
         page: p.number,
         span,
-        previous: p.spans[i - 1],
+        line: p.spans
+          .filter(
+            (other) =>
+              Math.abs(other.rect.y - span.rect.y) <=
+              Math.max(span.rect.height, other.rect.height) * 0.5,
+          )
+          .map((other) => other.text)
+          .join(" "),
       })),
     )
     .find(
@@ -70,6 +77,6 @@ export function internalReferenceTarget(
         caption.test(item.span.text) ||
         (kind === "eq" &&
           numberedEquation.test(item.span.text) &&
-          /[=∑∫√+−×]/.test(`${item.span.text} ${item.previous?.text ?? ""}`)),
+          /[=∑∫√+−×]/.test(item.line)),
     );
 }

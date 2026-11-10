@@ -146,7 +146,7 @@ export async function buildIndex(
     }
   }
   return indexSchema.parse({
-    version: 3,
+    version: 4,
     embedding: identity,
     contextIdentity: provider.contextIdentity,
     contextual,

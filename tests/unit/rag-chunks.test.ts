@@ -47,6 +47,9 @@ test("parents are page-local and children preserve section and kind", () => {
   ];
   paper.pages.push({ ...page, number: 2 });
   const chunks = chunkPapers([paper], 220, 900);
+  expect(chunks.every((chunk) => !chunk.text.startsWith("2 Methods"))).toBe(
+    true,
+  );
   expect(
     chunks.filter((c) => c.page === 1 && c.kind === "text").length,
   ).toBeGreaterThan(2);

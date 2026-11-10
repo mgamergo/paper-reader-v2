@@ -1,5 +1,9 @@
 # Logbook
 
+## 2026-11-10 • Extended acceptance
+
+Twelve additional browser cases passed on the fresh production build: DOI/URL imports, drag-drop, invalid/oversized/scanned imports and retry, citation groups/ranges/author-year/superscripts/unresolved, transformed highlight alignment, all assistant action protocols, filters, keyboard controls, Hindi paired-citation UI protocol and mobile import bounds. Hindi is an explicitly manual protocol fixture, not generated model quality. Expected resource console errors are allowed only for exact predeclared HTTP400 import validation cases. Other diagnostics stay strict. Headings now live in section metadata rather than answer text; index format4 forces rebuild. Private local export including files passed ZIP integrity; restore untested. Full 31-case release run and both independent reviews are next.
+
 ## 2026-11-10 • Acceptance fixes and production retrieval
 
 Fixed coordinate-aware repeated-word context, numbered-equation previews, exact-source glossary extraction, stale citation links and collection chat cleanup, and normalized local loopback origins. All 106 unit/integration tests passed with 488 assertions; strict types, lint and production build passed. Both isolated ablation and complete production-stage retrieval pass unchanged real-paper judgments. Fresh production browser run is active; no browser acceptance claim until it completes. Added arXiv DataCite DOI routing and bounded follow-up query context. Escape can be remapped while retaining physical Escape for accessible dismissal.

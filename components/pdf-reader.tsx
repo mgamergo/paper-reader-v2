@@ -1198,7 +1198,7 @@ function ReferenceCard({
   const link = safeLink(resolved.url) ?? safeLink(resolved.pdfUrl);
   return (
     <HoverPopover onOpenChange={setOpen} trigger={trigger}>
-      <div className="reference-preview">
+      <div className="reference-preview" tabIndex={-1}>
         {references.length > 1 && (
           <label className="citation-group-label">
             Cited works
@@ -1252,8 +1252,11 @@ function ReferenceCard({
         <Button
           className="primary"
           disabled={!source || busy || imported || !!resolved.ingestedPaperId}
-          onClick={() => {
+          onClick={(event) => {
             if (!source) return;
+            event.currentTarget
+              .closest<HTMLElement>(".reference-preview")
+              ?.focus();
             setBusy(true);
             void onImport(source)
               .then(() => setImported(true))

@@ -73,7 +73,7 @@ export class MockProvider implements RagProvider {
     provider: "offline",
     model: "token-hash",
     dimensions: 256,
-    revision: "3",
+    revision: "4",
   };
   readonly contextIdentity = "offline-title-section-excerpt-v1";
   readonly limitations = [

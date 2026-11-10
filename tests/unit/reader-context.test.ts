@@ -55,3 +55,15 @@ test("local normalized loopback origins preserve ports and reject external write
     false,
   );
 });
+
+test("equation labels separated from formulas by whitespace PDF spans resolve", () => {
+  const spans = [
+    { text: "a = b + c", rect, fontSize: 12 },
+    { text: " ", rect: { ...rect, x: 200 }, fontSize: 12 },
+    { text: "(1)", rect: { ...rect, x: 250 }, fontSize: 12 },
+  ];
+  expect(
+    internalReferenceTarget({ pages: [{ ...pages[0]!, spans }] }, "eq", "1")
+      ?.span.text,
+  ).toBe("(1)");
+});

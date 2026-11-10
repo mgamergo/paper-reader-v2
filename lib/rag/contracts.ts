@@ -90,7 +90,7 @@ export interface RagProvider {
   }): Promise<SupportVerdict>;
 }
 export const indexSchema = z.object({
-  version: z.literal(3),
+  version: z.literal(4),
   embedding: embeddingIdentitySchema,
   contextIdentity: z.string(),
   contextual: z.boolean(),
